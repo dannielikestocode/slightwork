@@ -1,18 +1,38 @@
-# Salesforce DX Project: Next Steps
+# ⚡ Salesforce Lightning Development Framework (SLDF)
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+> A modern, lightweight, and extensible framework for building next-generation Salesforce Lightning experiences.
 
-## How Do You Plan to Deploy Your Changes?
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Salesforce](https://img.shields.io/badge/Salesforce-Lightning-blue)
+![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+---
 
-## Configure Your Salesforce DX Project
+## 🚀 Overview
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+The **Salesforce Lightning Development Framework (SLDF)** reimagines how developers build on the Salesforce platform.  
+Designed with **modern web standards**, **modular architecture**, and **developer productivity** in mind, SLDF helps teams create scalable, maintainable, and high-performance Lightning apps with ease.
 
-## Read All About It
+This framework seamlessly integrates with **Lightning Web Components (LWC)** and **Apex**, while introducing a set of tools, utilities, and design patterns that simplify development across the Salesforce ecosystem.
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+---
+
+## ✨ Features
+
+- ⚙️ **Component-Driven Architecture** — Build reusable, encapsulated Lightning modules  
+- ⚡ **Optimized for LWC** — Fully compatible with Salesforce Lightning Web Components 
+
+---
+
+## Project Structure
+
+my-lightning-app/
+├── src/
+│   ├── components/       # Lightning Web Components
+│   ├── layouts/          # Page layouts and containers
+│   ├── themes/           # Tokens, variables, and styles
+│   ├── utils/            # Shared utilities and helpers
+│   └── services/         # Apex integration layer
+├── sldf.config.js        # Framework configuration
+└── package.json
+
