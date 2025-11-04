@@ -1,4 +1,4 @@
-# ⚡ Salesforce Lightning Development Framework (SLDF)
+# ⚡ Salesforce Lightning Development Framework
 
 > A modern, lightweight, and extensible framework for building next-generation Salesforce Lightning experiences.
 
@@ -8,31 +8,12 @@
 
 ---
 
-## 🚀 Overview
+## Overview
 
-The **Salesforce Lightning Development Framework (SLDF)** reimagines how developers build on the Salesforce platform.  
-Designed with **modern web standards**, **modular architecture**, and **developer productivity** in mind, SLDF helps teams create scalable, maintainable, and high-performance Lightning apps with ease.
-
-This framework seamlessly integrates with **Lightning Web Components (LWC)** and **Apex**, while introducing a set of tools, utilities, and design patterns that simplify development across the Salesforce ecosystem.
+The **Salesforce Lightning Development Framework** reimagines how developers build on the Salesforce platform. This framework seamlessly integrates with **Lightning Web Components (LWC)** and **Apex**, while introducing a set of tools, utilities, and design patterns that simplify development across the Salesforce ecosystem.
 
 ---
 
-## ✨ Features
+## Features
 
-- ⚙️ **Component-Driven Architecture** — Build reusable, encapsulated Lightning modules  
-- ⚡ **Optimized for LWC** — Fully compatible with Salesforce Lightning Web Components 
-
----
-
-## Project Structure
-
-my-lightning-app/
-├── src/
-│   ├── components/       # Lightning Web Components
-│   ├── layouts/          # Page layouts and containers
-│   ├── themes/           # Tokens, variables, and styles
-│   ├── utils/            # Shared utilities and helpers
-│   └── services/         # Apex integration layer
-├── sldf.config.js        # Framework configuration
-└── package.json
-
+- **Modular Architecture** — Build reusable, encapsulated platform modules
