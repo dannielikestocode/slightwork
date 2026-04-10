@@ -1,10 +1,4 @@
 /**
- * Class Name: IllegalStateException
- * 
- * Module: Exceptions
- * 
- * Description: 
- * 
  * The IllegalStateException is used to throw exceptions
  * when building an instance of a object with invalid
  * state (I.e., Fails validations).
