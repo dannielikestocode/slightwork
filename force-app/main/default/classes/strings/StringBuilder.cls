@@ -8,16 +8,16 @@
 public without sharing class StringBuilder {
     // String Parts
     private final List<String> stringParts {get;set;}
-    private final Set<String> existingValues {get;set;} // For deduplication
+    private final Set<String> existingValues {get;set;}
 
     // Options
-    private final NullValueAction actionOnNullValue {get;set;}
-    private final Boolean trimValue {get;set;}
-    private final Boolean skipBlanks {get;set;}
-    private final Boolean deduplicate {get;set;}
-    private final Integer maxLength {get;set;}
-    private final MaxLengthAction actionOnMaxLengthExceeded {get;set;}
-    private final String delimiter {get;set;}
+    private NullValueAction actionOnNullValue {get;set;}
+    private Boolean trimValue {get;set;}
+    private Boolean skipBlanks {get;set;}
+    private Boolean deduplicate {get;set;}
+    private Integer maxLength {get;set;}
+    private MaxLengthAction actionOnMaxLengthExceeded {get;set;}
+    private String separator {get;set;}
 
     // Derived Properties
     public Integer size {
@@ -45,39 +45,6 @@ public without sharing class StringBuilder {
     }
 
     /**
-     * Encapsulates configurable options for the StringBuilder.
-     * Provide an instance to the overloaded constructor to 
-     * customize behavior.
-     */
-    public class BuilderOptions {
-        private NullValueAction actionOnNullValue {get;set;}
-        private Boolean trimValue {get;set;}
-        private Boolean skipBlanks {get;set;}
-        private Boolean deduplicate {get;set;}
-        private Integer maxLength {get;set;}
-        private MaxLengthAction actionOnMaxLengthExceeded {get;set;}
-        private String delimiter {get;set;}
-
-        public BuilderOptions() {
-            this.actionOnNullValue = NullValueAction.CONVERT_TO_BLANK;
-            this.trimValue = false;
-            this.skipBlanks = false;
-            this.deduplicate = false;
-            this.maxLength = null;
-            this.actionOnMaxLengthExceeded = MaxLengthAction.THROW_EXCEPTION;
-            this.delimiter = '';
-        }
-
-        public BuilderOptions withActionOnNullValue(NullValueAction value) { this.actionOnNullValue = value; return this; }
-        public BuilderOptions withTrimValue(Boolean value) { this.trimValue = value; return this; }
-        public BuilderOptions withSkipBlanks(Boolean value) { this.skipBlanks = value; return this; }
-        public BuilderOptions withDeduplicate(Boolean value) { this.deduplicate = value; return this; }
-        public BuilderOptions withMaxLength(Integer value) { this.maxLength = value; return this; }
-        public BuilderOptions withActionOnMaxLengthExceeded(MaxLengthAction value) { this.actionOnMaxLengthExceeded = value; return this; }
-        public BuilderOptions withDelimiter(String value) { this.delimiter = value; return this; }
-    }
-
-    /**
      * No-arg, default constructor
      */
     public StringBuilder() {
@@ -92,64 +59,63 @@ public without sharing class StringBuilder {
         this.deduplicate = false;
         this.maxLength = null;
         this.actionOnMaxLengthExceeded = MaxLengthAction.THROW_EXCEPTION;
-        this.delimiter = '';
-
-        this.validate();
-    }
-    
-    /**
-     * Overloaded constructor with BuilderOptions argument
-     * for setting properties
-     */
-    public StringBuilder(BuilderOptions options) {
-        if (options == null) {
-            throw new IllegalArgumentException('StringBuilder options cannot be null for constructor');
-        }
-
-        // String Parts
-        this.stringParts = new List<String>();
-        this.existingValues = new Set<String>();
-
-        // Options from provided BuilderOptions (allowing null for optional ones)
-        this.actionOnNullValue = options.actionOnNullValue;
-        this.trimValue = options.trimValue;
-        this.skipBlanks = options.skipBlanks;
-        this.deduplicate = options.deduplicate;
-        this.maxLength = options.maxLength;
-        this.actionOnMaxLengthExceeded = options.actionOnMaxLengthExceeded;
-        this.delimiter = options.delimiter;
-
-        this.validate();
+        this.separator = '';
     }
 
-    public void validate() {
-        if (this.actionOnNullValue == null) {
+    public StringBuilder withActionOnNullValue(NullValueAction value) {
+        if (value == null) {
             throw new IllegalStateException('Null Value Action cannot be null');
         }
+        this.actionOnNullValue = value;
+        return this;
+    }
 
-        if (this.trimValue == null) {
+    public StringBuilder withTrimValue(Boolean value) {
+        if (value == null) {
             throw new IllegalStateException('Trim Value cannot be null');
         }
+        this.trimValue = value;
+        return this;
+    }
 
-        if (this.skipBlanks == null) {
+    public StringBuilder withSkipBlanks(Boolean value) {
+        if (value == null) {
             throw new IllegalStateException('Skip Blanks cannot be null');
         }
+        this.skipBlanks = value;
+        return this;
+    }
 
-        if (this.deduplicate == null) {
+    public StringBuilder withDeduplicate(Boolean value) {
+        if (value == null) {
             throw new IllegalStateException('Deduplicate cannot be null');
         }
+        this.deduplicate = value;
+        return this;
+    }
 
-        if (this.maxLength != null && this.maxLength < 0) {
+    public StringBuilder withMaxLength(Integer value) {
+        if (value == null || value < 0) {
             throw new IllegalStateException('Max Length must be a value of zero or greater');
         }
+        this.maxLength = value;
+        return this;
+    }
 
-        if (this.actionOnMaxLengthExceeded == null) {
-            throw new IllegalStateException('Action On Max Length Exceeded cannot be null');
+    public StringBuilder withActionOnMaxLengthExceeded(MaxLengthAction value) {
+        if (value == null) {
+            throw new IllegalArgumentException('Action On Max Length Exceeded cannot be null');
         }
+        this.actionOnMaxLengthExceeded = value;
+        return this;
+    }
 
-        if (this.delimiter == null) {
-            throw new IllegalStateException('Delimiter cannot be null');
+    public StringBuilder withSeparator(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException('Separator cannot be null');
         }
+        this.separator = value;
+        return this;
     }
 
     public StringBuilder append(Object value) {
@@ -208,7 +174,7 @@ public without sharing class StringBuilder {
     }
 
     public String build() {
-        String result = String.join(this.stringParts, this.delimiter);
+        String result = String.join(this.stringParts, this.separator);
         if (this.maxLength != null && result.length() > this.maxLength) {
             if (this.actionOnMaxLengthExceeded == MaxLengthAction.THROW_EXCEPTION) {
                 throw new IllegalStateException(String.format(
