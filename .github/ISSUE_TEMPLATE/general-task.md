@@ -2,17 +2,12 @@
 name: General Task
 about: Used for creating general development or configuration tasks.
 title: ''
-labels: ''
-assignees: ''
+labels: enhancement
+assignees: dannielikestocode
 
 ---
 
 ### Summary
-TBD
-
----
-
-### Goal
 TBD
 
 ---
