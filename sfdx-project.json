@@ -1,12 +1,60 @@
 {
   "packageDirectories": [
     {
-      "path": "force-app",
+      "path": "async",
+      "default": false
+    },
+    {
+      "path": "base",
       "default": true
+    },
+    {
+      "path": "components",
+      "default": false
+    },
+    {
+      "path": "entity",
+      "default": false
+    },
+    {
+      "path": "files",
+      "default": false
+    },
+    {
+      "path": "integration",
+      "default": false
+    },
+    {
+      "path": "notification",
+      "default": false
+    },
+    {
+      "path": "observability",
+      "default": false
+    },
+    {
+      "path": "platform",
+      "default": false
+    },
+    {
+      "path": "primitives",
+      "default": false
+    },
+    {
+      "path": "qa",
+      "default": false
+    },
+    {
+      "path": "query",
+      "default": false
+    },
+    {
+      "path": "security",
+      "default": false
     }
   ],
   "name": "slightwork",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "64.0"
+  "sourceApiVersion": "66.0"
 }

@@ -1,6 +1,6 @@
 {
-  "orgName": "Demo company",
-  "edition": "Developer",
+  "orgName": "Wynforce - SlightWork",
+  "edition": "Partner Enterprise",
   "features": ["EnableSetPasswordInApi"],
   "settings": {
     "lightningExperienceSettings": {
