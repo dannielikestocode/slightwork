@@ -1,4 +1,4 @@
-# SlightWork - The Modern Salesforce Development Framework
+# SlightWork - The Lightweight Salesforce Developer Framework
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Salesforce](https://img.shields.io/badge/Salesforce-Lightning-blue)
