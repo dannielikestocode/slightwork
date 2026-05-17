@@ -1,159 +1,118 @@
 public without sharing class ENV {
 
-    private static Map<String, Environment_Variable__c> pending =
-        new Map<String, Environment_Variable__c>();
-
-    /*
-     * Retrieves an environment variable value by key.
-     */
-    public static Object get(String key) {
-
-        Environment_Variable__c record =
-            Environment_Variable__c.getValues(key);
-
-        if (record == null) {
-            return null;
+    private static Map<String, EnvironmentVariable> envVars {
+        get {
+            if (envVars == null) {
+                envVars = new Map<String,EnvironmentVariable>();
+                for (Environment_Variable__c record: Environment_Variable__c.getAll().values()) {
+                    envVars.put(record.Name, new EnvironmentVariable(record));
+                }
+            }
+            return envVars;
         }
-
-        if (record.String_Value__c != null) {
-            return record.String_Value__c;
-        }
-
-        if (record.Integer_Value__c != null) {
-            return Integer.valueOf(record.Integer_Value__c);
-        }
-
-        if (record.Decimal_Value__c != null) {
-            return record.Decimal_Value__c;
-        }
-
-        if (record.Boolean_Value__c != null) {
-            return record.Boolean_Value__c;
-        }
-
-        if (record.Date_Value__c != null) {
-            return record.Date_Value__c;
-        }
-
-        if (record.Datetime_Value__c != null) {
-            return record.Datetime_Value__c;
-        }
-
-        return null;
+        set;
     }
 
     /*
-     * Adds/updates a pending environment variable.
+     * Wrapper class for Environment_Variable__c custom setting.
      */
-    public static void put(String key, Object value) {
+    public class EnvironmentVariable {
 
-        Environment_Variable__c record =
-            createRecord(key, value);
-
-        pending.put(key, record);
-    }
-
-    /*
-     * Adds/updates and deploys immediately.
-     */
-    public static DeploymentResult putAndDeploy(
-        String key,
-        Object value
-    ) {
-
-        put(key, value);
-
-        return deploy();
-    }
-
-    /*
-     * Deploys all pending environment variables.
-     */
-    public static DeploymentResult deploy() {
-
-        DeploymentResult result = new DeploymentResult();
-
-        if (pending.isEmpty()) {
-            return result;
+        public Environment_Variable__c record {get; private set;}
+        private String key {get; set;}
+        private String value {get; set;}
+        private DataType currentDataType {get; set;}
+        
+        public EnvironmentVariable(Environment_Variable__c record) {
+            this.key = record.Name;
+            this.value = record.Value__c;
+            this.currentDataType = record.Data_Type__c;
         }
 
-        List<Environment_Variable__c> records =
-            pending.values();
+        /*
+         * Sets the value and clears other fields if data type changes.
+         */
+        public void setValue(Object value) {
+            if (value == null) {
+                return;
+            }
 
-        upsert records Key__c;
+            // Determine the new data type of the incoming value
+            // and clear the data for all existing fields if the
+            // data type isn't the same
+            DataType newDataType = getDataType(value);
+            if (currentDataType != null && currentDataType != newDataType) {
+                clearAllFields();
+            }
 
-        result.records.addAll(records);
+            if (value instanceof String) {
+                record.String_Value__c = String.valueOf(value);
+                currentDataType = DataType.STRING;
+            } 
+            else if (value instanceof Integer) {
+                record.Integer_Value__c = (Integer)value;
+                currentDataType = DataType.INTEGER;
+            } 
+            else if (value instanceof Long) {
+                record.Integer_Value__c = Decimal.valueOf(String.valueOf(value));
+                currentDataType = DataType.INTEGER;
+            } else if (value instanceof Decimal) {
 
-        pending.clear();
+                record.Decimal_Value__c = (Decimal)value;
+                currentDataType = DataType.DOUBLE;
 
-        return result;
-    }
+            } else if (value instanceof Double) {
 
-    /*
-     * Creates a custom setting record from a typed value.
-     */
-    private static Environment_Variable__c createRecord(
-        String key,
-        Object value
-    ) {
+                record.Decimal_Value__c =
+                    Decimal.valueOf(String.valueOf(value));
+                currentDataType = DataType.DOUBLE;
 
-        Environment_Variable__c record =
-            new Environment_Variable__c();
+            } else if (value instanceof Boolean) {
 
-        record.Key__c = key;
-        record.Name = key;
+                record.Boolean_Value__c = (Boolean)value;
+                currentDataType = DataType.BOOLEAN;
 
-        if (value == null) {
-            return record;
+            } else if (value instanceof Date) {
+
+                record.Date_Value__c = (Date)value;
+                currentDataType = DataType.DATE;
+
+            } else if (value instanceof Datetime) {
+
+                record.Datetime_Value__c = (Datetime)value;
+                currentDataType = DataType.DATETIME;
+
+            } else {
+
+                record.String_Value__c = JSON.serialize(value);
+                currentDataType = DataType.STRING;
+            }
         }
 
-        if (value instanceof String) {
-
-            record.String_Value__c =
-                (String)value;
-
-        } else if (value instanceof Integer) {
-
-            record.Integer_Value__c =
-                (Integer)value;
-
-        } else if (value instanceof Long) {
-
-            record.Integer_Value__c =
-                Decimal.valueOf(String.valueOf(value));
-
-        } else if (value instanceof Decimal) {
-
-            record.Decimal_Value__c =
-                (Decimal)value;
-
-        } else if (value instanceof Double) {
-
-            record.Decimal_Value__c =
-                Decimal.valueOf(String.valueOf(value));
-
-        } else if (value instanceof Boolean) {
-
-            record.Boolean_Value__c =
-                (Boolean)value;
-
-        } else if (value instanceof Date) {
-
-            record.Date_Value__c =
-                (Date)value;
-
-        } else if (value instanceof Datetime) {
-
-            record.Datetime_Value__c =
-                (Datetime)value;
-
-        } else {
-
-            record.String_Value__c =
-                JSON.serialize(value);
+        /*
+         * Gets the data type name for a given value.
+         */
+        public DataType getDataType(Object value) {
+            if (value instanceof String) {
+                return DataType.STRING;
+            }
+            else if (value instanceof Integer || value instanceof Long) {
+                return DataType.INTEGER;
+            }
+            else if (value instanceof Decimal || value instanceof Double) {
+                return DataType.DOUBLE;
+            }
+            else if (value instanceof Boolean) {
+                return DataType.BOOLEAN;
+            }
+            else if (value instanceof Date) {
+                return DataType.DATE;
+            }
+            else if (value instanceof Datetime) {
+                return DataType.DATETIME;
+            }
+            return DataType.STRING;
         }
-
-        return record;
     }
 
     /*
@@ -161,13 +120,98 @@ public without sharing class ENV {
      */
     public class DeploymentResult {
 
-        public List<Environment_Variable__c> records {
-            get;
-            private set;
-        }
+        public List<EnvironmentVariable> records {get; private set;}
 
         public DeploymentResult() {
-            records = new List<Environment_Variable__c>();
+            records = new List<EnvironmentVariable>();
         }
+    }
+
+    /*
+     * Retrieves an environment variable value by key.
+     */
+    public static EnvironmentVariable get(String key) {
+        if (String.isBlank(key)) {
+            return null;
+        }
+        key = key.trim();
+
+        // First, attempt to fetch environment variable
+        // from in-memory map
+        EnvironmentVariable envVar = envVars.get(key);
+        if (envVar != null) {
+            return envVar;
+        }
+
+        // If no match founds within in-memory, attempt to
+        // perform a match on any persisted Environment_Variable__c records
+        Environment_Variable__c envVarRecord = Environment_Variable__c.getValues(key);
+        if (envVarRecord != null) {
+           envVar = new EnvironmentVariable(envVarRecord);
+           envVars.put(envVar.Name, envVar);
+           return envVar;
+        }
+        return null;
+    }
+
+    /*
+     * Adds environment variable to in-memory map.
+     */
+    public static void put(String key, Object value) {
+        if (String.isBlank(key) || value == null) {
+            return null;
+        }
+        key = key.trim();
+        EnvironmentVariable envVar = buildEnvironmentVariable(key, value);
+    }
+
+    /*
+     * Adds/updates and deploys immediately.
+     */
+    public static DeploymentResult putAndDeploy(String key, Object value) {
+        put(key, value);
+        return deploy();
+    }
+
+    /*
+     * Persists all in-memory environment variables.
+     */
+    public static DeploymentResult deploy() {
+        DeploymentResult result = new DeploymentResult();
+        if (envVars.isEmpty()) {
+            return result;
+        }
+
+        List<Environment_Variable__c> records = new List<Environment_Variable__c>();
+        for (EnvironmentVariable envVar : envVars.values()) {
+            records.add(envVar.record);
+        }
+        upsert records Name;
+
+        result.records.addAll(records);
+
+        envVars.clear();
+
+        return result;
+    }
+
+    /*
+     * Creates an EnvironmentVariable wrapper from a typed value.
+     */
+    private static EnvironmentVariable buildEnvironmentVariable(String key, Object value) {
+        EnvironmentVariable envVar = envVars.get(key);
+
+        if (envVar == null) {
+            Environment_Variable__c record = new Environment_Variable__c();
+            record.Name = key;
+            record.Value__c = String.valueOf(value);
+            record.Data_Type__c = getDataType(value);
+            envVar = new EnvironmentVariable(record);
+        }
+        envVar.setValue(value);
+        
+        envVars.put(key, envVar);
+
+        return envVar;
     }
 }

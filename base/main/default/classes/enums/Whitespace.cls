@@ -5,6 +5,7 @@
  * @author Dannie @ Wynforce
  * @version v66
  */
+@NamespaceAccessible
 public enum Whitespace {
     SINGLE_SPACE,
     NEWLINE,

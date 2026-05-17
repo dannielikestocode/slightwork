@@ -6,4 +6,5 @@
  * @author Dannie @ Wynforce
  * @since v66.0
  */
+@NamespaceAccessible
 public without sharing class IllegalStateException extends Exception { }
