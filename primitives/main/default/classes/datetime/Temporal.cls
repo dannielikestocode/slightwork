@@ -238,28 +238,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
         return dow + 1;
     }
 
-    public static Integer quarter(Date d) {
-        return ((d.month() - 1) / 3) + 1;
-    }
-
-    public static Date firstDayOfQuarter(Date d) {
-
-        Integer quarterStartMonth =
-            ((quarter(d) - 1) * 3) + 1;
-
-        return Date.newInstance(
-            d.year(),
-            quarterStartMonth,
-            1
-        );
-    }
-
-    public static Date lastDayOfQuarter(Date d) {
-        return firstDayOfQuarter(d)
-            .addMonths(3)
-            .addDays(-1);
-    }
-
     /*
      * ============================================================
      * TIME HELPERS
