@@ -39,30 +39,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
 
     /*
      * ============================================================
-     * NOW HELPERS
-     * ============================================================
-     */
-
-    public static Datetime nowUtc() {
-        return Datetime.now();
-    }
-
-    public static Date today() {
-        return Date.today();
-    }
-
-    public static Time currentTime() {
-        Datetime dt = Datetime.now();
-        return Time.newInstance(
-            dt.hour(),
-            dt.minute(),
-            dt.second(),
-            dt.millisecond()
-        );
-    }
-
-    /*
-     * ============================================================
      * START / END HELPERS
      * ============================================================
      */
@@ -141,11 +117,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
         return !isWeekend(d);
     }
 
-    public static Boolean isLeapYear(Integer year) {
-        return Math.mod(year, 400) == 0 ||
-            (Math.mod(year, 4) == 0 && Math.mod(year, 100) != 0);
-    }
-
     public static Boolean isSameDay(Date a, Date b) {
         return a == b;
     }
@@ -166,7 +137,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
      */
 
     public static Date addBusinessDays(Date d, Integer days) {
-
         Integer direction = days >= 0 ? 1 : -1;
         Integer remaining = Math.abs(days);
 
@@ -185,7 +155,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
     }
 
     public static Integer businessDaysBetween(Date startDate, Date endDate) {
-
         if (startDate == endDate) {
             return 0;
         }
@@ -213,28 +182,7 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
      * ============================================================
      */
 
-    public static Boolean between(
-        Date target,
-        Date startDate,
-        Date endDate
-    ) {
-        return target >= startDate && target <= endDate;
-    }
-
-    public static Boolean between(
-        Datetime target,
-        Datetime startDate,
-        Datetime endDate
-    ) {
-        return target >= startDate && target <= endDate;
-    }
-
-    public static Integer daysBetween(Date startDate, Date endDate) {
-        return startDate.daysBetween(endDate);
-    }
-
     public static Integer monthsBetween(Date startDate, Date endDate) {
-
         Integer months =
             (endDate.year() - startDate.year()) * 12;
 
@@ -253,56 +201,8 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
         return dt.getTime() / 1000;
     }
 
-    public static Long toUnixMillis(Datetime dt) {
-        return dt.getTime();
-    }
-
     public static Datetime fromUnixSeconds(Long seconds) {
         return Datetime.newInstance(seconds * 1000);
-    }
-
-    public static Datetime fromUnixMillis(Long millis) {
-        return Datetime.newInstance(millis);
-    }
-
-    /*
-     * ============================================================
-     * SAFE CONSTRUCTION
-     * ============================================================
-     */
-
-    public static Date safeDate(
-        Integer year,
-        Integer month,
-        Integer day
-    ) {
-
-        Integer maxDay = daysInMonth(year, month);
-
-        Integer safeDay = Math.min(day, maxDay);
-
-        return Date.newInstance(year, month, safeDay);
-    }
-
-    public static Datetime safeDatetime(
-        Integer year,
-        Integer month,
-        Integer day,
-        Integer hour,
-        Integer minute,
-        Integer second
-    ) {
-
-        Date d = safeDate(year, month, day);
-
-        return Datetime.newInstance(
-            d.year(),
-            d.month(),
-            d.day(),
-            hour,
-            minute,
-            second
-        );
     }
 
     /*
@@ -312,12 +212,8 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
      */
 
     public static Integer daysInMonth(Integer year, Integer month) {
-
         Date start = Date.newInstance(year, month, 1);
-
-        return start.addMonths(1)
-            .addDays(-1)
-            .day();
+        return start.addMonths(1).addDays(-1).day();
     }
 
     /**
