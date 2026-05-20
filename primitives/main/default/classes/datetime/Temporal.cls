@@ -366,24 +366,6 @@ public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
 
     /*
      * ============================================================
-     * PARSING HELPERS
-     * ============================================================
-     */
-
-    public static Date parseDate(String value) {
-        return Date.valueOf(value);
-    }
-
-    public static Datetime parseDatetime(String value) {
-        return Datetime.valueOf(value);
-    }
-
-    public static Time parseTime(String value) {
-        return Time.valueOf(value);
-    }
-
-    /*
-     * ============================================================
      * TIME HELPERS
      * ============================================================
      */
