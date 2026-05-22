@@ -224,9 +224,9 @@ public inherited sharing class Logger {
     }
 
     // Flush all log records by publishing platform events
-    public void flush() {
+    public List<Database.SaveResult> flush() {
         if (this.logQueue.isEmpty()) {
-            return;
+            return new List<Database.SaveResult>();
         }
 
         List<Log_Event__e> events = new List<Log_Event__e>();
@@ -258,6 +258,8 @@ public inherited sharing class Logger {
 
         // Clear the queue after publishing
         this.logQueue.clear();
+        
+        return results;
     }
 
     // Get the current queue size
