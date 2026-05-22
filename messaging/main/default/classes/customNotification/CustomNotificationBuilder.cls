@@ -12,7 +12,7 @@
  * @since v66.0
  * @see Messaging.CustomNotification
  */
-public with sharing class CustomNotificationBuilder {
+public inherited sharing class CustomNotificationBuilder {
     
     // ─── Core Properties ─────────────────────────────────────────────────
     

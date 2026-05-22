@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requires_Authentication__c</fullName>
+    <label>Requires Authentication</label>
+    <description>Whether this endpoint requires authentication. Future enhancement for authentication validation.</description>
+    <required>false</required>
+    <type>Checkbox</type>
+    <defaultValue>true</defaultValue>
+</CustomField>

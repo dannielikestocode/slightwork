@@ -4,19 +4,19 @@
  * @author Dannie @ Wynforce
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Messaging_CustomNotification.htm
  */
-public without sharing class CustomNotificationSenderService implements Sendable {
-    public CustomNotification notification {private get; set;}
-    public Set<Id> recipientIds {private get;set;}
+public inherited sharing class CustomNotificationSenderService {
+    public Messaging.CustomNotification notification {private get; set;}
+    public Set<String> recipientIds {private get;set;}
     
-    public CustomNotificationSenderService(CustomNotification notification, Set<Id> recipientsIds) {
+    public CustomNotificationSenderService(Messaging.CustomNotification notification, Set<String> recipientIds) {
         this.notification = notification;
-        this.recipientIds = recipientsIds;
+        this.recipientIds = recipientIds;
     }
 
     public SendResult send() {
         Boolean isSuccess = false;
         try {
-            this.notification.send(this.recipientsIds);
+            this.notification.send(this.recipientIds);
             isSuccess = true;
         }
         catch (Exception e) {

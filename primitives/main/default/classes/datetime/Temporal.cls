@@ -21,7 +21,7 @@
  * Date nextBusiness = Temporal.addBusinessDays(System.today(), 5);
  * Long epoch = Temporal.toUnixMillis(Datetime.now());
  */
-public without sharing class Temporal {
+public inherited sharing class Temporal {
 
     public static final Integer DAYS_PER_WEEK = 7;
     public static final Integer MONTHS_PER_YEAR = 12;

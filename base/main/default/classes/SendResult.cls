@@ -1,5 +1,5 @@
 @NamespaceAccessible
-public without sharing class SendResult {
+public inherited sharing class SendResult {
     public final Boolean isSuccess {get; private set;}
 
     public SendResult(Boolean isSuccess) {

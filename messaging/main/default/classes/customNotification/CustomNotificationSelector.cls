@@ -9,7 +9,7 @@
  * @since v66.0
  * @see Messaging.CustomNotification
  */
-public without sharing class CustomNotificationSelector {
+public inherited sharing class CustomNotificationSelector {
     /**
      * Queries a single CustomNotificationType by its record Id.
      * Returns all available fields for the notification type.

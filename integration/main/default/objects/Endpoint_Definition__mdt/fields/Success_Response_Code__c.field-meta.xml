@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Success_Response_Code__c</fullName>
+    <label>Success Response Code</label>
+    <description>HTTP status code to return on successful request processing (e.g., 200, 201, 204)</description>
+    <required>false</required>
+    <type>Number</type>
+    <precision>3</precision>
+    <scale>0</scale>
+    <defaultValue>200</defaultValue>
+</CustomField>

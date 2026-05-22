@@ -5,7 +5,7 @@
  * @author Dannie @ Wynforce
  * @since v66.0
  */
-public without sharing class StringBuilder {
+public inherited sharing class StringBuilder {
     // String Parts
     private final List<String> stringParts {get;set;}
     private final Set<String> existingValues {get;set;}

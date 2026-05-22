@@ -1,5 +1,5 @@
 // List custom settings needs to be enabled: https://help.salesforce.com/s/articleView?id=000383145&type=1
-public without sharing class EnvironmentManager {
+public inherited sharing class EnvironmentManager {
     private final DeploymentTarget target {get;set;}
 
     private Map<String, EnvironmentVariable> envVars {

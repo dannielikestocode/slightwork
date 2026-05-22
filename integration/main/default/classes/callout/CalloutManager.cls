@@ -11,7 +11,7 @@
  * @see HttpRequest
  * @see HttpResponse
  */
-public without sharing class CalloutManager {
+public inherited sharing class CalloutManager {
     
     // ─── Core Properties ─────────────────────────────────────────────────
     
