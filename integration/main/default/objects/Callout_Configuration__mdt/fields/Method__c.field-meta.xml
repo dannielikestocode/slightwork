@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Method__c</fullName>
+    <label>Method</label>
+    <description>The HTTP method for the callout.</description>
+    <inlineHelpText>HTTP method (GET, POST, PUT, PATCH, DELETE, etc.).</inlineHelpText>
+    <type>Text</type>
+    <length>10</length>
+    <required>false</required>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Endpoint__c</fullName>
+    <label>Endpoint</label>
+    <description>The endpoint URL or path for the HTTP callout.</description>
+    <inlineHelpText>Full URL (e.g., https://api.example.com/users) or path when using Named Credential (e.g., /users).</inlineHelpText>
+    <type>Url</type>
+    <required>false</required>
+</CustomField>
