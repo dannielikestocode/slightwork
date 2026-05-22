@@ -25,7 +25,7 @@
       "default": false
     },
     {
-      "path": "notification",
+      "path": "messaging",
       "default": false
     },
     {
