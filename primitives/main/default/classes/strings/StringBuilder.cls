@@ -4,13 +4,18 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
+ * @see https://slightwork.dev/modules/primitives.html#stringbuilder
  */
 public inherited sharing class StringBuilder {
-    // String Parts
+    /**
+     * String Builder Parts
+     */
     private final List<String> stringParts {get;set;}
     private final Set<String> existingValues {get;set;}
 
-    // Options
+    /**
+     * Builder Options
+     */
     private NullValueAction actionOnNullValue {get;set;}
     private Boolean trimValue {get;set;}
     private Boolean skipBlanks {get;set;}
@@ -19,7 +24,9 @@ public inherited sharing class StringBuilder {
     private MaxLengthAction actionOnMaxLengthExceeded {get;set;}
     private String separator {get;set;}
 
-    // Derived Properties
+    /**
+     * Derived Properties
+     */
     public Integer size {
         get {
             return this.stringParts.size();
@@ -32,7 +39,9 @@ public inherited sharing class StringBuilder {
         }
     }
 
-    // Action-based Enums
+    /**
+     *  Action-based Enums
+     */
     public enum NullValueAction {
         CONVERT_TO_BLANK,
         CONVERT_TO_SINGLE_SPACE,
@@ -62,6 +71,12 @@ public inherited sharing class StringBuilder {
         this.separator = '';
     }
 
+    /**
+     * Sets the action to perform when a null value is appended
+     * 
+     * @param value The null value action strategy
+     * @return This instance for method chaining
+     */
     public StringBuilder withActionOnNullValue(NullValueAction value) {
         if (value == null) {
             throw new IllegalStateException('Null Value Action cannot be null');
@@ -70,6 +85,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets whether to trim whitespace from appended values
+     * 
+     * @param value True to trim values, false otherwise
+     * @return This instance for method chaining
+     */
     public StringBuilder withTrimValue(Boolean value) {
         if (value == null) {
             throw new IllegalStateException('Trim Value cannot be null');
@@ -78,6 +99,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets whether to skip blank/empty values when appending
+     * 
+     * @param value True to skip blanks, false otherwise
+     * @return This instance for method chaining
+     */
     public StringBuilder withSkipBlanks(Boolean value) {
         if (value == null) {
             throw new IllegalStateException('Skip Blanks cannot be null');
@@ -86,6 +113,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets whether to deduplicate values (skip duplicate entries)
+     * 
+     * @param value True to deduplicate, false otherwise
+     * @return This instance for method chaining
+     */
     public StringBuilder withDeduplicate(Boolean value) {
         if (value == null) {
             throw new IllegalStateException('Deduplicate cannot be null');
@@ -94,6 +127,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets the maximum length for the final built string
+     * 
+     * @param value The maximum length (must be 0 or greater)
+     * @return This instance for method chaining
+     */
     public StringBuilder withMaxLength(Integer value) {
         if (value == null || value < 0) {
             throw new IllegalStateException('Max Length must be a value of zero or greater');
@@ -102,6 +141,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets the action to perform when max length is exceeded
+     * 
+     * @param value The max length action strategy
+     * @return This instance for method chaining
+     */
     public StringBuilder withActionOnMaxLengthExceeded(MaxLengthAction value) {
         if (value == null) {
             throw new IllegalArgumentException('Action On Max Length Exceeded cannot be null');
@@ -110,6 +155,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Sets the separator to use when joining string parts
+     * 
+     * @param value The separator string
+     * @return This instance for method chaining
+     */
     public StringBuilder withSeparator(String value) {
         if (value == null) {
             throw new IllegalArgumentException('Separator cannot be null');
@@ -118,6 +169,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Appends an object's string representation to the builder
+     * 
+     * @param value The object to append
+     * @return This instance for method chaining
+     */
     public StringBuilder append(Object value) {
         // If an object of a class overrides the "toString()" method, String.valueOf()
         // will call the overriden toString() method. Otherwise, a log-friendly, 
@@ -138,6 +195,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Appends all objects from a list to the builder
+     * 
+     * @param values The list of objects to append
+     * @return This instance for method chaining
+     */
     public StringBuilder appendAll(List<Object> values) {
         if (values == null || values.isEmpty()) {
             return this;
@@ -149,6 +212,12 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Appends a specific type of whitespace to the builder
+     * 
+     * @param wsType The type of whitespace
+     * @return This instance for method chaining
+     */
     public StringBuilder appendWhitespace(Whitespace wsType) {
         if (wsType == null) {
             throw new IllegalStateException('Whitespace argument cannot be null');
@@ -173,6 +242,11 @@ public inherited sharing class StringBuilder {
         return this;
     }
 
+    /**
+     * Builds and returns the final concatenated string
+     * 
+     * @return The joined string with configured separator, respecting max length settings
+     */
     public String build() {
         String result = String.join(this.stringParts, this.separator);
         if (this.maxLength != null && result.length() > this.maxLength) {
@@ -189,11 +263,20 @@ public inherited sharing class StringBuilder {
         return result;
     }
 
+    /**
+     * Clears all appended string parts and resets the builder
+     */
     public void clear() {
         this.stringParts.clear();
         this.existingValues.clear();
     }
 
+    /**
+     * Processes a value according to configured options (null handling, trimming, etc.)
+     * 
+     * @param value The string value to process
+     * @return The processed string value
+     */
     private String processValue(String value) {
         // A value of the type null (unless it's the string literal)
         // should never be returned after processing

@@ -1,347 +1,310 @@
 /**
- * Temporal.cls
+ * A comprehensive utility API for working with Date, Time, and Datetime
+ * within Apex.
  *
- * A comprehensive utility API for working with Date, Time, and Datetime in Apex.
- *
- * Features:
- * - Start/end boundaries
- * - Relative date math
- * - Business day calculations
- * - Comparisons
- * - Parsing/formatting helpers
- * - Unix timestamp conversions
- * - Range utilities
- * - Leap year and calendar helpers
- * - Safe construction methods
- *
- * Example:
- *
- * Datetime nowUtc = Temporal.nowUtc();
- * Datetime startOfWeek = Temporal.startOfWeek(System.today());
- * Date nextBusiness = Temporal.addBusinessDays(System.today(), 5);
- * Long epoch = Temporal.toUnixMillis(Datetime.now());
+ * @author Dannie @ Wynforce
+ * @since v66.0
+ * @see https://slightwork.dev/modules/primitives.html#temporal
+ * @see https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
  */
 public inherited sharing class Temporal {
-
+    /**
+     * Significant Values
+     */
+    private static final Integer ZERO_LITERAL = 0;
+    private static final Integer ONE_LITERAL = 1;
+    
+    /**
+     * Calendar Constants
+     */
+    public static final Integer FIRST_MONTH_OF_YEAR = 1;
+    public static final Integer LAST_MONTH_OF_YEAR = 12;
+    public static final Integer FIRST_DAY_OF_MONTH = 1;
     public static final Integer DAYS_PER_WEEK = 7;
-    public static final Integer MONTHS_PER_YEAR = 12;
+    public static final Integer MAX_DAYS_PER_MONTH = 31;
 
     /**
- * ============================================================
- * MILLIS CONSTANTS
- * ============================================================
- */
-
-public static final Long MILLIS_PER_SECOND = 1000L;
-public static final Long MILLIS_PER_MINUTE = 60L * MILLIS_PER_SECOND;
-public static final Long MILLIS_PER_HOUR   = 60L * MILLIS_PER_MINUTE;
-public static final Long MILLIS_PER_DAY    = 24L * MILLIS_PER_HOUR;
-
-    /*
-     * ============================================================
-     * START / END HELPERS
-     * ============================================================
+     * Time Constants
      */
+    public static final Integer MILLIS_PER_SECOND = 1000;
+    public static final Integer MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
+    public static final Integer MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
+    public static final Integer MILLIS_PER_DAY = 24 * MILLIS_PER_HOUR;
+    public static final Integer FIRST_HOUR_OF_DAY = 0;
+    public static final Integer FIRST_MINUTE_OF_HOUR = 0;
+    public static final Integer FIRST_SECOND_OF_MINUTE = 0;
+    public static final Integer LAST_HOUR_OF_DAY = 23;
+    public static final Integer LAST_MINUTE_OF_HOUR = 59;
+    public static final Integer LAST_SECOND_OF_MINUTE = 59;
 
-    public static Datetime startOfDay(Date d) {
+    /**
+     * Constructs a Datetime instance in the user's local time zone
+     * on the start time (12AM) of the given date.
+     * 
+     * @param Date d The given date
+     * @return Datetime instance at 12:00:00 AM on the given date
+     */
+    public static Datetime localStartOfDay(Date d) {
         return Datetime.newInstance(
             d.year(),
             d.month(),
             d.day(),
-            0,
-            0,
-            0
+            FIRST_HOUR_OF_DAY,
+            FIRST_MINUTE_OF_HOUR,
+            FIRST_SECOND_OF_MINUTE
         );
     }
 
-    public static Datetime endOfDay(Date d) {
+    /**
+     * Constructs a Datetime instance in the user's local time zone
+     * on the end time (11:59:59 PM) of the given date.
+     * 
+     * @param d The given date
+     * @return Datetime instance at 11:59:59 PM on the given date
+     */
+    public static Datetime localEndOfDay(Date d) {
         return Datetime.newInstance(
             d.year(),
             d.month(),
             d.day(),
-            23,
-            59,
-            59
+            LAST_HOUR_OF_DAY,
+            LAST_MINUTE_OF_HOUR,
+            LAST_SECOND_OF_MINUTE
         );
     }
 
+    /**
+     * Returns the first day of the month for the given date.
+     * 
+     * @param d The given date
+     * @return The first day of the month
+     */
     public static Date startOfMonth(Date d) {
-        return Date.newInstance(d.year(), d.month(), 1);
+        return d.toStartOfMonth();
     }
 
-    public static Date endOfMonth(Date d) {
-        return startOfMonth(d).addMonths(1).addDays(-1);
-    }
-
-    public static Date startOfYear(Date d) {
-        return Date.newInstance(d.year(), 1, 1);
-    }
-
-    public static Date endOfYear(Date d) {
-        return Date.newInstance(d.year(), 12, 31);
-    }
-
-    public static Date startOfWeek(Date d) {
-        Integer dow = getDayOfWeek(d);
-        return d.addDays(-(dow - 1));
-    }
-
-    public static Date endOfWeek(Date d) {
-        return startOfWeek(d).addDays(6);
-    }
-
-    /*
-     * ============================================================
-     * DATE COMPARISON
-     * ============================================================
+    /**
+     * Returns the last day of the month for the given date.
+     * 
+     * @param d The given date
+     * @return The last day of the month
      */
+    public static Date endOfMonth(Date d) {
+        return d.addMonths(ONE_LITERAL).toStartOfMonth().addDays(-ONE_LITERAL);
+    }
 
+    /**
+     * Returns the first day of the year (January 1st) for the given date.
+     * 
+     * @param d The given date
+     * @return January 1st of the year
+     */
+    public static Date startOfYear(Date d) {
+        return Date.newInstance(d.year(), FIRST_MONTH_OF_YEAR, FIRST_DAY_OF_MONTH);
+    }
+
+    /**
+     * Returns the last day of the year (December 31st) for the given date.
+     * 
+     * @param d The given date
+     * @return December 31st of the year
+     */
+    public static Date endOfYear(Date d) {
+        return Date.newInstance(d.year(), LAST_MONTH_OF_YEAR, MAX_DAYS_PER_MONTH);
+    }
+
+    /**
+     * Returns the first day of the week (Sunday) for the given date.
+     * 
+     * @param d The given date
+     * @return The Sunday of the week
+     */
+    public static Date startOfWeek(Date d) {
+        return d.toStartOfWeek();
+    }
+
+    /**
+     * Returns the last day of the week (Saturday) for the given date.
+     * 
+     * @param d The given date
+     * @return The Saturday of the week
+     */
+    public static Date endOfWeek(Date d) {
+        return startOfWeek(d).addDays(DAYS_PER_WEEK - ONE_LITERAL);
+    }
+
+    /**
+     * Checks if the given date is today.
+     * 
+     * @param d The date to check
+     * @return True if the date is today, false otherwise
+     */
     public static Boolean isToday(Date d) {
         return d == Date.today();
     }
 
+    /**
+     * Checks if the given date is in the past.
+     * 
+     * @param d The date to check
+     * @return True if the date is before today, false otherwise
+     */
     public static Boolean isPast(Date d) {
         return d < Date.today();
     }
 
+    /**
+     * Checks if the given date is in the future.
+     * 
+     * @param d The date to check
+     * @return True if the date is after today, false otherwise
+     */
     public static Boolean isFuture(Date d) {
         return d > Date.today();
     }
 
+    /**
+     * Checks if the given date falls on a weekend (Saturday or Sunday).
+     * 
+     * @param d The date to check
+     * @return True if the date is Saturday or Sunday, false otherwise
+     */
     public static Boolean isWeekend(Date d) {
-        Integer dow = getDayOfWeek(d);
-        return dow == 6 || dow == 7;
+        Integer dayOfWeek = getIsoDayOfWeek(d);
+        return dayOfWeek == 6 || dayOfWeek == 7;
     }
 
+    /**
+     * Checks if the given date falls on a weekday (Monday through Friday).
+     * 
+     * @param d The date to check
+     * @return True if the date is a weekday, false otherwise
+     */
     public static Boolean isWeekday(Date d) {
         return !isWeekend(d);
     }
 
-    public static Boolean isSameDay(Date a, Date b) {
-        return a == b;
-    }
-
-    public static Boolean isSameMonth(Date a, Date b) {
-        return a.year() == b.year() &&
-            a.month() == b.month();
-    }
-
-    public static Boolean isSameYear(Date a, Date b) {
-        return a.year() == b.year();
-    }
-
-    /*
-     * ============================================================
-     * BUSINESS DAYS
-     * ============================================================
+    /**
+     * Checks if two dates are the same day.
+     * 
+     * @param firstDate The first date to compare
+     * @param secondDate The second date to compare
+     * @return True if both dates are the same, false otherwise
      */
+    public static Boolean isSameDay(Date firstDate, Date secondDate) {
+        return firstDate == secondDate;
+    }
 
-    public static Date addBusinessDays(Date d, Integer days) {
-        Integer direction = days >= 0 ? 1 : -1;
-        Integer remaining = Math.abs(days);
+    /**
+     * Checks if two dates fall in the same month and year.
+     * 
+     * @param firstDate The first date to compare
+     * @param secondDate The second date to compare
+     * @return True if both dates are in the same month and year, false otherwise
+     */
+    public static Boolean isSameMonth(Date firstDate, Date secondDate) {
+        return firstDate.year() == secondDate.year() && firstDate.month() == secondDate.month();
+    }
 
-        Date current = d;
+    /**
+     * Checks if two dates fall in the same year.
+     * 
+     * @param firstDate The first date to compare
+     * @param secondDate The second date to compare
+     * @return True if both dates are in the same year, false otherwise
+     */
+    public static Boolean isSameYear(Date firstDate, Date secondDate) {
+        return firstDate.year() == secondDate.year();
+    }
 
+    /**
+     * Adds business days (weekdays only) to a date, skipping weekends.
+     * 
+     * @param currentDate The starting date
+     * @param daysToAdd The number of business days to add (can be negative to subtract)
+     * @return The resulting date after adding business days
+     */
+    public static Date addBusinessDays(Date inputDate, Integer daysToAdd) {
+        Integer direction = daysToAdd >= ZERO_LITERAL ? ONE_LITERAL : -ONE_LITERAL;
+        Integer remaining = Math.abs(daysToAdd);
+        Date currentDate = inputDate;
         while (remaining > 0) {
-
-            current = current.addDays(direction);
-
-            if (isWeekday(current)) {
+            currentDate = currentDate.addDays(direction);
+            if (isWeekday(currentDate)) {
                 remaining--;
             }
         }
-
-        return current;
+        return currentDate;
     }
 
+    /**
+     * Calculates the number of business days (weekdays only) between two dates.
+     * 
+     * @param startDate The starting date
+     * @param endDate The ending date
+     * @return The number of business days between the dates
+     */
     public static Integer businessDaysBetween(Date startDate, Date endDate) {
         if (startDate == endDate) {
-            return 0;
+            return ZERO_LITERAL;
         }
 
-        Integer direction = startDate < endDate ? 1 : -1;
-
+        Integer direction = startDate < endDate ? ONE_LITERAL : -ONE_LITERAL;
         Date current = startDate;
-        Integer total = 0;
-
+        Integer total = ZERO_LITERAL;
         while (current != endDate) {
-
             current = current.addDays(direction);
-
             if (isWeekday(current)) {
                 total += direction;
             }
         }
-
         return total;
     }
 
-    /*
-     * ============================================================
-     * RANGE HELPERS
-     * ============================================================
+    /**
+     * Returns the day of the week according to the ISO standard    
+     * (Monday = 1, Sunday = 7).
+     * 
+     * @param inputDate The provided date to review
+     * @return Integer ISO day of week (Monday=1, ..., Sunday=7)
+     * @see https://en.wikipedia.org/wiki/ISO_week_date
      */
+    public static Integer getIsoDayOfWeek(Date inputDate) {
+        if (inputDate == null) {
+            return null;
+        }
 
-    public static Integer monthsBetween(Date startDate, Date endDate) {
-        Integer months =
-            (endDate.year() - startDate.year()) * 12;
-
-        months += endDate.month() - startDate.month();
-
-        return months;
-    }
-
-    /*
-     * ============================================================
-     * UNIX / EPOCH HELPERS
-     * ============================================================
-     */
-
-    public static Long toUnixSeconds(Datetime dt) {
-        return dt.getTime() / 1000;
-    }
-
-    public static Datetime fromUnixSeconds(Long seconds) {
-        return Datetime.newInstance(seconds * 1000);
-    }
-
-    /*
-     * ============================================================
-     * CALENDAR HELPERS
-     * ============================================================
-     */
-
-    public static Integer daysInMonth(Integer year, Integer month) {
-        Date start = Date.newInstance(year, month, 1);
-        return start.addMonths(1).addDays(-1).day();
+        Datetime dt = Datetime.newInstance(
+            inputDate.year(),
+            inputDate.month(),
+            inputDate.day()
+        );
+        return Integer.valueOf(dt.format('u'));
     }
 
     /**
-     * Returns:
-     * 1 = Monday
-     * 2 = Tuesday
-     * ...
-     * 7 = Sunday
+     * Returns a human-readable relative date string (e.g., "Today", "Yesterday", "In 5 days").
+     * 
+     * @param d The date to describe relative to today
+     * @return A relative date description
      */
-    public static Integer getDayOfWeek(Date d) {
-
-        Date anchor = Date.newInstance(1900, 1, 1);
-
-        Integer days = anchor.daysBetween(d);
-
-        Integer dow = Math.mod(days, 7);
-
-        if (dow < 0) {
-            dow += 7;
-        }
-
-        return dow + 1;
-    }
-
-    /*
-     * ============================================================
-     * TIME HELPERS
-     * ============================================================
-     */
-
-    public static Integer secondsBetween(Time start, Time end) {
-
-        Integer startSeconds =
-            (start.hour() * 3600) +
-            (start.minute() * 60) +
-            start.second();
-
-        Integer endSeconds =
-            (end.hour() * 3600) +
-            (end.minute() * 60) +
-            end.second();
-
-        return endSeconds - startSeconds;
-    }
-
-    public static Time addSeconds(Time t, Integer seconds) {
-
-        Integer totalMillis =
-            (
-                (t.hour() * 3600) +
-                (t.minute() * 60) +
-                t.second()
-            ) * 1000;
-
-        totalMillis += t.millisecond();
-        totalMillis += seconds * 1000;
-
-        Integer millisPerDay = 24 * 60 * 60 * 1000;
-
-        totalMillis = Math.mod(totalMillis, millisPerDay);
-
-        if (totalMillis < 0) {
-            totalMillis += millisPerDay;
-        }
-
-        Integer hour = totalMillis / (60 * 60 * 1000);
-        totalMillis = Math.mod(totalMillis, 60 * 60 * 1000);
-
-        Integer minute = totalMillis / (60 * 1000);
-        totalMillis = Math.mod(totalMillis, 60 * 1000);
-
-        Integer second = totalMillis / 1000;
-        Integer millisecond = Math.mod(totalMillis, 1000);
-
-        return Time.newInstance(
-            hour,
-            minute,
-            second,
-            millisecond
-        );
-    }
-
-    /*
-     * ============================================================
-     * HUMAN FRIENDLY HELPERS
-     * ============================================================
-     */
-
     public static String relativeDate(Date d) {
-
         Integer diff = Date.today().daysBetween(d);
-
-        if (diff == 0) {
+        if (diff == ZERO_LITERAL) {
             return 'Today';
         }
 
-        if (diff == 1) {
+        if (diff == ONE_LITERAL) {
             return 'Tomorrow';
         }
 
-        if (diff == -1) {
+        if (diff == -ONE_LITERAL) {
             return 'Yesterday';
         }
 
-        if (diff > 1) {
+        if (diff > ONE_LITERAL) {
             return 'In ' + diff + ' days';
         }
-
         return Math.abs(diff) + ' days ago';
-    }
-
-    public static String monthName(Integer month) {
-
-        List<String> names = new List<String>{
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-        };
-
-        return names[month - 1];
     }
 }

@@ -3,19 +3,10 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
+ * @see StringBuilder.cls
  */
 @IsTest
-private class StringBuilderTests {
-    /**
-     * Private inner test class to validate
-     * the toString() override
-     */
-    private class TestStringOverload { 
-        public override String toString() { 
-            return 'Test toString()'; 
-        }
-    }
-
+private without sharing class StringBuilderTests {
     @IsTest
     private static void testDefaultsAndBuildEmpty() {
         StringBuilder sb = new StringBuilder();
@@ -162,5 +153,15 @@ private class StringBuilderTests {
         // After trim/skip/dedupe: values => 'a' (second 'a' removed), null => ' ' then skipped due to skipBlanks, blanks skipped
         // build => 'a-bcdef' then truncated to 5 => 'a-bcd'
         Assert.areEqual('a-bcd', sb.build(), 'Options passed via with methods should be honored');
+    }
+
+    /**
+     * Private inner test class to validate
+     * the toString() override
+     */
+    private class TestStringOverload { 
+        public override String toString() { 
+            return 'Test toString()'; 
+        }
     }
 }
