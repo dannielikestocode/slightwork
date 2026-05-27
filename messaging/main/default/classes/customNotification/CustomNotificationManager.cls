@@ -1,38 +1,28 @@
 /**
- * Builder for creating and sending Salesforce Custom Notifications.
- * Provides a fluent API for configuring notification properties before sending.
+ * Handles managing the lifecycle of a Custom Notification, from
+ * creation to sending.
  * 
- * Based on the Messaging.CustomNotification API, this builder supports:
- * - Custom notification type configuration
- * - Target recipient specification (user IDs or record IDs)
- * - Notification title and body content
- * - Record page navigation
- * 
- * @author Agentforce
+ * @author Dannie @ Wynforce
  * @since v66.0
- * @see Messaging.CustomNotification
+ * @see https://slightwork.dev/modules/messaging.html#notification
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Messaging_CustomNotification.htm
  */
-public inherited sharing class CustomNotificationBuilder {
-    
-    // ─── Core Properties ─────────────────────────────────────────────────
-    
-    private String notificationTypeId;
-    private String title;
-    private String body;
-    private Id targetId;
-    private Set<String> recipientIds;
-    
-    // ─── Constructor ─────────────────────────────────────────────────────
+public inherited sharing class CustomNotificationManager {
+    /**
+     * Core Properties
+     */
+    private String notificationTypeId {get; set;}
+    private String title {get; set;}
+    private String body {get; set;}
+    private Id targetId {get; set;}
+    private final Set<String> recipientIds {get; set;}
     
     /**
-     * Creates a new CustomNotificationBuilder instance.
-     * All configuration is performed via the fluent builder methods.
+     * Default, no-arg constructor
      */
-    public CustomNotificationBuilder() {
+    public CustomNotificationManager() {
         this.recipientIds = new Set<String>();
     }
-    
-    // ─── Builder Methods ─────────────────────────────────────────────────
     
     /**
      * Sets the Custom Notification Type ID or Developer Name.
@@ -44,7 +34,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.withNotificationTypeId('Custom_Notification_Type');
      */
-    public CustomNotificationBuilder withNotificationTypeId(String notificationTypeId) {
+    public CustomNotificationManager withNotificationTypeId(String notificationTypeId) {
         if (String.isBlank(notificationTypeId)) {
             throw new IllegalArgumentException('Notification Type ID cannot be blank');
         }
@@ -62,7 +52,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.withTitle('New Case Assigned');
      */
-    public CustomNotificationBuilder withTitle(String title) {
+    public CustomNotificationManager withTitle(String title) {
         if (String.isBlank(title)) {
             throw new IllegalArgumentException('Title cannot be blank');
         }
@@ -80,7 +70,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.withBody('Case #12345 has been assigned to you.');
      */
-    public CustomNotificationBuilder withBody(String body) {
+    public CustomNotificationManager withBody(String body) {
         if (String.isBlank(body)) {
             throw new IllegalArgumentException('Body cannot be blank');
         }
@@ -98,7 +88,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.withTargetId(caseRecord.Id);
      */
-    public CustomNotificationBuilder withTargetId(Id targetId) {
+    public CustomNotificationManager withTargetId(Id targetId) {
         this.targetId = targetId;
         return this;
     }
@@ -113,7 +103,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.addRecipient(UserInfo.getUserId());
      */
-    public CustomNotificationBuilder addRecipient(String recipientId) {
+    public CustomNotificationManager addRecipient(String recipientId) {
         if (String.isBlank(recipientId)) {
             throw new IllegalArgumentException('Recipient ID cannot be blank');
         }
@@ -131,7 +121,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.addRecipients(new Set<String>{ userId1, userId2 });
      */
-    public CustomNotificationBuilder addRecipients(Set<String> recipientIds) {
+    public CustomNotificationManager addRecipients(Set<String> recipientIds) {
         if (recipientIds == null || recipientIds.isEmpty()) {
             throw new IllegalArgumentException('Recipient IDs cannot be null or empty');
         }
@@ -149,7 +139,7 @@ public inherited sharing class CustomNotificationBuilder {
      * @example
      * builder.addRecipients(new List<String>{ userId1, userId2 });
      */
-    public CustomNotificationBuilder addRecipients(List<String> recipientIds) {
+    public CustomNotificationManager addRecipients(List<String> recipientIds) {
         if (recipientIds == null || recipientIds.isEmpty()) {
             throw new IllegalArgumentException('Recipient IDs cannot be null or empty');
         }
@@ -196,9 +186,17 @@ public inherited sharing class CustomNotificationBuilder {
      *        .addRecipient(UserInfo.getUserId())
      *        .send();
      */
-    public void send() {
-        Messaging.CustomNotification notification = build();
-        notification.send(this.recipientIds);
+    public SendResult send() {
+        Boolean isSuccess = false;
+        try {
+            Messaging.CustomNotification notification = build();
+            notification.send(this.recipientIds);
+            isSuccess = true;
+        }
+        catch (Exception e) {
+            System.debug('Failed to send custom notification: ' + e.getMessage());
+        }
+        return new SendResult(isSuccess);
     }
     
     // ─── Validation Methods ──────────────────────────────────────────────
@@ -238,11 +236,11 @@ public inherited sharing class CustomNotificationBuilder {
      * Creates a new builder instance with the notification type already set.
      * 
      * @param notificationTypeId The Custom Notification Type ID or Developer Name
-     * @return A new CustomNotificationBuilder instance
+     * @return A new CustomNotificationManager instance
      * @example
-     * CustomNotificationBuilder builder = CustomNotificationBuilder.create('Custom_Alert');
+     * CustomNotificationManager builder = CustomNotificationManager.create('Custom_Alert');
      */
-    public static CustomNotificationBuilder create(String notificationTypeId) {
-        return new CustomNotificationBuilder().withNotificationTypeId(notificationTypeId);
+    public static CustomNotificationManager create(String notificationTypeId) {
+        return new CustomNotificationManager().withNotificationTypeId(notificationTypeId);
     }
 }

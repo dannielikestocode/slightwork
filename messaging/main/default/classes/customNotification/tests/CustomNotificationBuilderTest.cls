@@ -1,24 +1,24 @@
 /**
- * Test class for CustomNotificationBuilder.
+ * Test class for CustomNotificationManager.
  * Validates builder pattern, fluent API, validation logic, and notification sending.
  * 
- * @author Agentforce
+ * @author Dannie @ Wynforce
  * @since v66.0
+ * @see CustomNotificationManager.cls
  */
-@isTest
-private class CustomNotificationBuilderTest {
-    
+@IsTest
+private without sharing class CustomNotificationBuilderTest {
     private static final String NOTIFICATION_TYPE_ID = 'Test_Notification_Type';
     private static final String TEST_TITLE = 'Test Notification Title';
     private static final String TEST_BODY = 'Test notification body content';
     
     // ─── Constructor Tests ───────────────────────────────────────────────
     
-    @isTest
-    static void constructor_ShouldInitializeEmptyRecipientSet() {
+    @IsTest
+    private static void constructor_ShouldInitializeEmptyRecipientSet() {
         // When
         Test.startTest();
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         Test.stopTest();
         
         // Then
@@ -27,24 +27,24 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: withNotificationTypeId ────────────────────
     
-    @isTest
-    static void withNotificationTypeId_ValidId_ShouldSetProperty() {
+    @IsTest
+    private static void withNotificationTypeId_ValidId_ShouldSetProperty() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.withNotificationTypeId(NOTIFICATION_TYPE_ID);
+        CustomNotificationManager result = builder.withNotificationTypeId(NOTIFICATION_TYPE_ID);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void withNotificationTypeId_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void withNotificationTypeId_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -58,10 +58,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void withNotificationTypeId_EmptyString_ShouldThrowException() {
+    @IsTest
+    private static void withNotificationTypeId_EmptyString_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -77,24 +77,24 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: withTitle ─────────────────────────────────
     
-    @isTest
-    static void withTitle_ValidTitle_ShouldSetProperty() {
+    @IsTest
+    private static void withTitle_ValidTitle_ShouldSetProperty() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.withTitle(TEST_TITLE);
+        CustomNotificationManager result = builder.withTitle(TEST_TITLE);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void withTitle_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void withTitle_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -108,10 +108,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void withTitle_EmptyString_ShouldThrowException() {
+    @IsTest
+    private static void withTitle_EmptyString_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -127,24 +127,24 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: withBody ──────────────────────────────────
     
-    @isTest
-    static void withBody_ValidBody_ShouldSetProperty() {
+    @IsTest
+    private static void withBody_ValidBody_ShouldSetProperty() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.withBody(TEST_BODY);
+        CustomNotificationManager result = builder.withBody(TEST_BODY);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void withBody_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void withBody_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -158,10 +158,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void withBody_EmptyString_ShouldThrowException() {
+    @IsTest
+    private static void withBody_EmptyString_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -177,29 +177,29 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: withTargetId ──────────────────────────────
     
-    @isTest
-    static void withTargetId_ValidId_ShouldSetProperty() {
+    @IsTest
+    private static void withTargetId_ValidId_ShouldSetProperty() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         Id testAccountId = TestDataFactory.createUser('Standard User', true).Id;
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.withTargetId(testAccountId);
+        CustomNotificationManager result = builder.withTargetId(testAccountId);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void withTargetId_NullValue_ShouldSetPropertyToNull() {
+    @IsTest
+    private static void withTargetId_NullValue_ShouldSetPropertyToNull() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.withTargetId(null);
+        CustomNotificationManager result = builder.withTargetId(null);
         Test.stopTest();
         
         // Then - no exception should be thrown since targetId is optional
@@ -208,25 +208,25 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: addRecipient ──────────────────────────────
     
-    @isTest
-    static void addRecipient_ValidId_ShouldAddToSet() {
+    @IsTest
+    private static void addRecipient_ValidId_ShouldAddToSet() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         String userId = UserInfo.getUserId();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.addRecipient(userId);
+        CustomNotificationManager result = builder.addRecipient(userId);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void addRecipient_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void addRecipient_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -240,10 +240,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void addRecipient_EmptyString_ShouldThrowException() {
+    @IsTest
+    private static void addRecipient_EmptyString_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -259,25 +259,25 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: addRecipients (Set) ───────────────────────
     
-    @isTest
-    static void addRecipientsSet_ValidIds_ShouldAddAllToSet() {
+    @IsTest
+    private static void addRecipientsSet_ValidIds_ShouldAddAllToSet() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         Set<String> userIds = new Set<String>{ UserInfo.getUserId() };
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.addRecipients(userIds);
+        CustomNotificationManager result = builder.addRecipients(userIds);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void addRecipientsSet_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void addRecipientsSet_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         Set<String> nullSet = null;
         
         // When/Then
@@ -292,10 +292,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void addRecipientsSet_EmptySet_ShouldThrowException() {
+    @IsTest
+    private static void addRecipientsSet_EmptySet_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         Set<String> emptySet = new Set<String>();
         
         // When/Then
@@ -312,25 +312,25 @@ private class CustomNotificationBuilderTest {
     
     // ─── Builder Method Tests: addRecipients (List) ──────────────────────
     
-    @isTest
-    static void addRecipientsList_ValidIds_ShouldAddAllToSet() {
+    @IsTest
+    private static void addRecipientsList_ValidIds_ShouldAddAllToSet() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         List<String> userIds = new List<String>{ UserInfo.getUserId() };
         
         // When
         Test.startTest();
-        CustomNotificationBuilder result = builder.addRecipients(userIds);
+        CustomNotificationManager result = builder.addRecipients(userIds);
         Test.stopTest();
         
         // Then
         Assert.areEqual(builder, result, 'Should return same builder instance for chaining');
     }
     
-    @isTest
-    static void addRecipientsList_NullValue_ShouldThrowException() {
+    @IsTest
+    private static void addRecipientsList_NullValue_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         List<String> nullList = null;
         
         // When/Then
@@ -345,10 +345,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void addRecipientsList_EmptyList_ShouldThrowException() {
+    @IsTest
+    private static void addRecipientsList_EmptyList_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         List<String> emptyList = new List<String>();
         
         // When/Then
@@ -365,10 +365,10 @@ private class CustomNotificationBuilderTest {
     
     // ─── Build Method Tests ──────────────────────────────────────────────
     
-    @isTest
-    static void build_AllRequiredFields_ShouldReturnNotification() {
+    @IsTest
+    private static void build_AllRequiredFields_ShouldReturnNotification() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withNotificationTypeId(NOTIFICATION_TYPE_ID)
             .withTitle(TEST_TITLE)
             .withBody(TEST_BODY)
@@ -383,10 +383,10 @@ private class CustomNotificationBuilderTest {
         Assert.isNotNull(notification, 'Should return a CustomNotification instance');
     }
     
-    @isTest
-    static void build_MissingNotificationTypeId_ShouldThrowException() {
+    @IsTest
+    private static void build_MissingNotificationTypeId_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withTitle(TEST_TITLE)
             .withBody(TEST_BODY)
             .addRecipient(UserInfo.getUserId());
@@ -403,10 +403,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void build_MissingTitle_ShouldThrowException() {
+    @IsTest
+    private static void build_MissingTitle_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withNotificationTypeId(NOTIFICATION_TYPE_ID)
             .withBody(TEST_BODY)
             .addRecipient(UserInfo.getUserId());
@@ -423,10 +423,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void build_MissingBody_ShouldThrowException() {
+    @IsTest
+    private static void build_MissingBody_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withNotificationTypeId(NOTIFICATION_TYPE_ID)
             .withTitle(TEST_TITLE)
             .addRecipient(UserInfo.getUserId());
@@ -443,10 +443,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void build_MissingRecipients_ShouldThrowException() {
+    @IsTest
+    private static void build_MissingRecipients_ShouldThrowException() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withNotificationTypeId(NOTIFICATION_TYPE_ID)
             .withTitle(TEST_TITLE)
             .withBody(TEST_BODY);
@@ -463,10 +463,10 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    @isTest
-    static void build_MultipleFieldsMissing_ShouldListAllMissing() {
+    @IsTest
+    private static void build_MultipleFieldsMissing_ShouldListAllMissing() {
         // Given
-        CustomNotificationBuilder builder = new CustomNotificationBuilder();
+        CustomNotificationManager builder = new CustomNotificationManager();
         
         // When/Then
         Test.startTest();
@@ -486,13 +486,13 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
     }
     
-    // ─── Static Factory Method Tests ─────────────────────────────────────
+    // ─── private static Factory Method Tests ─────────────────────────────────────
     
-    @isTest
-    static void create_ValidNotificationTypeId_ShouldReturnConfiguredBuilder() {
+    @IsTest
+    private static void create_ValidNotificationTypeId_ShouldReturnConfiguredBuilder() {
         // When
         Test.startTest();
-        CustomNotificationBuilder builder = CustomNotificationBuilder.create(NOTIFICATION_TYPE_ID);
+        CustomNotificationManager builder = CustomNotificationManager.create(NOTIFICATION_TYPE_ID);
         Test.stopTest();
         
         // Then
@@ -501,14 +501,14 @@ private class CustomNotificationBuilderTest {
     
     // ─── Fluent API Chaining Tests ───────────────────────────────────────
     
-    @isTest
-    static void fluentChaining_AllMethods_ShouldAllowMethodChaining() {
+    @IsTest
+    private static void fluentChaining_AllMethods_ShouldAllowMethodChaining() {
         // Given
         Id targetRecordId = UserInfo.getUserId();
         
         // When
         Test.startTest();
-        CustomNotificationBuilder builder = new CustomNotificationBuilder()
+        CustomNotificationManager builder = new CustomNotificationManager()
             .withNotificationTypeId(NOTIFICATION_TYPE_ID)
             .withTitle(TEST_TITLE)
             .withBody(TEST_BODY)
@@ -522,11 +522,11 @@ private class CustomNotificationBuilderTest {
         Assert.isNotNull(notification, 'Should successfully build with all methods chained');
     }
     
-    @isTest
-    static void fluentChaining_StaticFactory_ShouldAllowMethodChaining() {
+    @IsTest
+    private static void fluentChaining_StaticFactory_ShouldAllowMethodChaining() {
         // When
         Test.startTest();
-        CustomNotificationBuilder builder = CustomNotificationBuilder.create(NOTIFICATION_TYPE_ID)
+        CustomNotificationManager builder = CustomNotificationManager.create(NOTIFICATION_TYPE_ID)
             .withTitle(TEST_TITLE)
             .withBody(TEST_BODY)
             .addRecipient(UserInfo.getUserId());
@@ -535,6 +535,6 @@ private class CustomNotificationBuilderTest {
         Test.stopTest();
         
         // Then
-        Assert.isNotNull(notification, 'Should successfully build with static factory chaining');
+        Assert.isNotNull(notification, 'Should successfully build with private static factory chaining');
     }
 }
