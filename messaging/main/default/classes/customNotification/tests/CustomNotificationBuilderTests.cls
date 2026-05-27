@@ -7,7 +7,7 @@
  * @see CustomNotificationManager.cls
  */
 @IsTest
-private without sharing class CustomNotificationBuilderTest {
+private without sharing class CustomNotificationManagerTests {
     private static final String NOTIFICATION_TYPE_ID = 'Test_Notification_Type';
     private static final String TEST_TITLE = 'Test Notification Title';
     private static final String TEST_BODY = 'Test notification body content';
