@@ -4,7 +4,7 @@
  *
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/primitives.html#temporal
+ * @see https://slightwork.dev/modules/primitives/temporal.html
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_datetime.htm
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_date.htm
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_time.htm

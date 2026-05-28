@@ -5,9 +5,9 @@
  * CustomNotificationType is a standard Salesforce object that defines notification types
  * used with the Messaging.CustomNotification API.
  * 
- * @author Agentforce
+ * @author Dannie @ Wynforce
  * @since v66.0
- * @see Messaging.CustomNotification
+ * @see CustomNotificationManager.cls
  */
 public inherited sharing class CustomNotificationSelector {
     /**
