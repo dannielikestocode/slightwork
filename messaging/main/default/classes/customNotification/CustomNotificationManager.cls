@@ -194,9 +194,10 @@ public inherited sharing class CustomNotificationManager {
      * @return A configured Messaging.CustomNotification instance
      */
     public Messaging.CustomNotification build() {
-        Messaging.CustomNotification notification = new Messaging.CustomNotification();
+        validateState();
 
         // Set required properties
+        Messaging.CustomNotification notification = new Messaging.CustomNotification();
         notification.setNotificationTypeId(this.notificationTypeId);
         notification.setTitle(this.title);
         notification.setBody(this.body);
@@ -230,5 +231,35 @@ public inherited sharing class CustomNotificationManager {
             System.debug('Failed to send custom notification: ' + e.getMessage());
         }
         return new SendResult(isSuccess);
+    }
+
+    /**
+     * Validates the logical state of notification properties
+     * before the notification can be sent.
+     */
+    @TestVisible
+    private void validateState() {
+        if (String.isBlank(this.notificationTypeId)) {
+            throw new IllegalStateException('Notification Type Id is required');
+        }
+
+        if (String.isBlank(this.title)) {
+            throw new IllegalStateException('Title is required to send notification');
+        }
+
+        if (String.isBlank(this.body)) {
+            throw new IllegalStateException('Body is required to send notification');
+        }
+
+        if (String.isBlank(this.targetRecordId) && String.isBlank(this.targetPageReference)) {
+            throw new IllegalStateException('Target Record Id or Target Page Reference must be set');
+        }
+        else if (String.isNotBlank(this.targetRecordId) && String.isNotBlank(this.targetPageReference)) {
+            throw new IllegalStateException('Either Target Record Id or Target Page Reference must be set, not both');
+        }
+
+        if (this.recipientIds.isEmpty()) {
+            throw new IllegalStateException('At least 1 recipient is required to send a notification');
+        }
     }
 }
