@@ -5,10 +5,17 @@
  * @author Dannie @ Wynforce
  * @since v66.0
  */ 
-@NamespaceAccessible
 public inherited sharing class SendResult {
+    /**
+     * Properties
+     */
     public final Boolean isSuccess {get; private set;}
 
+    /**
+     * Constructor with args
+     * 
+     * @param isSuccess Indicates if the send result was successful
+     */
     public SendResult(Boolean isSuccess) {
         this.isSuccess = isSuccess;
     }
