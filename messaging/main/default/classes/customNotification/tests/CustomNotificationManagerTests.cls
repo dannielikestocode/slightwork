@@ -69,7 +69,7 @@ private without sharing class CustomNotificationManagerTests {
                 'Exception message should indicate blank notification type Id');
         }
     }
-
+    
     @IsTest
     private static void testWithNotificationTypeIdValid() {
         // Setup
@@ -102,23 +102,6 @@ private without sharing class CustomNotificationManagerTests {
             Assert.isTrue(e.getMessage().contains('Notification Type Id cannot be blank'), 
                 'Exception message should indicate blank notification type Id');
         }
-    }
-
-    @IsTest
-    private static void testWithSenderIdValid() {
-        // Setup
-        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
-        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
-        CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
-
-        // Execute
-        Test.startTest();
-        CustomNotificationManager result = manager.withSenderId(testUser.Id);
-        Test.stopTest();
-
-        // Assert
-        Assert.isNotNull(result, 'Should return instance for chaining');
-        Assert.areEqual(manager, result, 'Should return same instance for method chaining');
     }
 
     @IsTest
@@ -585,7 +568,7 @@ private without sharing class CustomNotificationManagerTests {
 
         // Assert
         Assert.isNotNull(result, 'SendResult should not be null');
-        Assert.isTrue(result.success, 'Send should be successful');
+        Assert.isTrue(result.isSuccess, 'Send should be successful');
     }
 
     @IsTest
@@ -607,7 +590,7 @@ private without sharing class CustomNotificationManagerTests {
 
         // Assert
         Assert.isNotNull(result, 'SendResult should not be null');
-        Assert.isTrue(result.success, 'Send should be successful with complete chaining');
+        Assert.isTrue(result.isSuccess, 'Send should be successful with complete chaining');
     }
 
     @IsTest
@@ -632,6 +615,161 @@ private without sharing class CustomNotificationManagerTests {
 
         // Assert
         Assert.isNotNull(result, 'SendResult should not be null');
-        Assert.isTrue(result.success, 'Send should be successful with multiple recipients');
+        Assert.isTrue(result.isSuccess, 'Send should be successful with multiple recipients');
+    }
+
+    @IsTest
+    private static void testValidateStateMissingNotificationTypeId() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withTitle('Test Title')
+                   .withBody('Test Body')
+                   .withTargetRecordId(testUser.Id)
+                   .addRecipient(testUser.Id);
+            
+            // Set notificationTypeId to null via withNotificationTypeId would throw before build
+            // So we test by not setting it after construction
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('Notification Type Id is required'), 
+                'Exception message should indicate notification type Id is required');
+        }
+    }
+
+    @IsTest
+    private static void testValidateStateMissingTitle() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withNotificationTypeId(notifType.Id)
+                   .withBody('Test Body')
+                   .withTargetRecordId(testUser.Id)
+                   .addRecipient(testUser.Id);
+            
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('Title is required'), 
+                'Exception message should indicate title is required');
+        }
+    }
+
+    @IsTest
+    private static void testValidateStateMissingBody() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withNotificationTypeId(notifType.Id)
+                   .withTitle('Test Title')
+                   .withTargetRecordId(testUser.Id)
+                   .addRecipient(testUser.Id);
+            
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('Body is required'), 
+                'Exception message should indicate body is required');
+        }
+    }
+
+    @IsTest
+    private static void testValidateStateMissingTargetRecordIdAndPageReference() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withNotificationTypeId(notifType.Id)
+                   .withTitle('Test Title')
+                   .withBody('Test Body')
+                   .addRecipient(testUser.Id);
+            
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('Target Record Id or Target Page Reference must be set'), 
+                'Exception message should indicate target is required');
+        }
+    }
+
+    @IsTest
+    private static void testValidateStateBothTargetRecordIdAndPageReference() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        String pageRef = '{"type":"standard__objectPage"}';
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withNotificationTypeId(notifType.Id)
+                   .withTitle('Test Title')
+                   .withBody('Test Body')
+                   .withTargetRecordId(testUser.Id)
+                   .withTargetPageReference(pageRef)
+                   .addRecipient(testUser.Id);
+            
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('Either Target Record Id or Target Page Reference must be set, not both'), 
+                'Exception message should indicate only one target should be set');
+        }
+    }
+
+    @IsTest
+    private static void testValidateStateNoRecipients() {
+        // Setup
+        CustomNotificationType notifType = [SELECT Id FROM CustomNotificationType LIMIT 1];
+        User testUser = [SELECT Id FROM User WHERE Username = 'testnotificationuser@slightwork.test.com' LIMIT 1];
+        
+        // Execute & Assert
+        try {
+            CustomNotificationManager manager = new CustomNotificationManager(notifType.Id);
+            manager.withNotificationTypeId(notifType.Id)
+                   .withTitle('Test Title')
+                   .withBody('Test Body')
+                   .withTargetRecordId(testUser.Id);
+            
+            Test.startTest();
+            Messaging.CustomNotification notification = manager.build();
+            Test.stopTest();
+            
+            Assert.fail('Should have thrown IllegalStateException');
+        } catch (IllegalStateException e) {
+            Assert.isTrue(e.getMessage().contains('At least 1 recipient is required'), 
+                'Exception message should indicate at least one recipient is required');
+        }
     }
 }

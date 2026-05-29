@@ -1,5 +1,5 @@
 /**
- * Handles managing the lifecycle of an Environment Variable.
+ * Handles managing the lifecycle of SlightWork's implementation of Environment Variables.
  * List Custom Settings needs to be enabled within an org.
  * 
  * @author Dannie @ Wynforce

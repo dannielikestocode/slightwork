@@ -56,6 +56,7 @@ public inherited sharing class CustomNotificationSelector {
                    CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp
             FROM CustomNotificationType
             WHERE DeveloperName = :developerName
+            WITH USER_MODE
             LIMIT 1
         ];
         
@@ -80,6 +81,7 @@ public inherited sharing class CustomNotificationSelector {
                    CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp
             FROM CustomNotificationType
             WHERE IsDeleted = false
+            WITH USER_MODE
             ORDER BY DeveloperName
         ];
     }

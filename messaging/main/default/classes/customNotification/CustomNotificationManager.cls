@@ -82,7 +82,7 @@ public inherited sharing class CustomNotificationManager {
             throw new IllegalArgumentException('Title cannot be blank');
         }
 
-        if (body.length() > MAX_TITLE_LENGTH) {
+        if (title.length() > MAX_TITLE_LENGTH) {
             throw new IllegalArgumentException('Title length cannot exceed 750 characters');
         }
         this.title = title;
