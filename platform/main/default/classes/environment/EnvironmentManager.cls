@@ -4,7 +4,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/environment.html#environmentManager
+ * @see https://slightwork.dev/modules/platform/environment-manager.html
  * @see https://help.salesforce.com/s/articleView?id=000383145&type=1 (For enablement of List Custom settings)
  */ 
 public inherited sharing class EnvironmentManager {

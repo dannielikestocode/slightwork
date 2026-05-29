@@ -1,3 +1,11 @@
+/**
+ * Provides a robust utility for logging messages both synchronously
+ * and asynchronously.
+ * 
+ * @author Dannie @ Wynforce
+ * @since v66.0
+ * @see https://slightwork.dev/modules/observability/logger.html
+ */
 public inherited sharing class Logger {
     // Log levels enum
     public enum LogLevel {
