@@ -15,6 +15,6 @@ trigger LogEventTrigger on Log_Event__e (after insert) {
     }
 
     if (!logsToInsert.isEmpty()) {
-        insert logsToInsert;
+        Database.insert(logsToInsert, true, AccessLevel.SYSTEM_MODE);
     }
 }

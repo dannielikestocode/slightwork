@@ -12,9 +12,9 @@
  * @see HttpResponse
  */
 public inherited sharing class CalloutManager {
-    
-    // ─── Core Properties ─────────────────────────────────────────────────
-    
+    /**
+     * Properties
+     */
     private String endpoint;
     private String method;
     private String body;

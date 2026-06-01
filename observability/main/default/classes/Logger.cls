@@ -7,134 +7,81 @@
  * @see https://slightwork.dev/modules/observability/logger.html
  */
 public inherited sharing class Logger {
-    // Log levels enum
-    public enum LogLevel {
-        ERROR,
-        WARN,
-        INFO,
-        DEBUG,
-        FINE
-    }
+    /**
+     * Constants
+     */
+    public static final String DEFAULT_CONFIGURATION_NAME = 'Default';
 
-    // Log target enum
+    /**
+     * Properties
+     */
+    private final LoggerConfiguration config {get;set;}
+    private final List<LogRecord> logQueue {get;set;}
+
+    /**
+     * Enums
+     */
     public enum LogTarget {
         SYSTEM_DEBUG,
         PLATFORM_EVENT,
-        BOTH
+        ALL
     }
 
-    // Inner class to represent a log record
-    private class LogRecord {
-        public DateTime timestamp;
-        public String timezoneId;
-        public String level;
-        public String message;
-        public String userId;
-        public String quiddity;
-        public String requestId;
-
-        public LogRecord(String level, String message) {
-            this.timestamp = DateTime.now();
-            this.level = level;
-            this.message = message;
-            this.userId = UserInfo.getUserId();
-            this.timezoneId = UserInfo.getTimeZone().getID();
-            this.quiddity = Request.getCurrent().getQuiddity()?.name();
-            this.requestId = Request.getCurrent().getRequestId();
-        }
-    }
-
-    // Instance variables
-    private List<LogRecord> logQueue;
-    private LogLevel currentLogLevel;
-    private LogTarget currentLogTarget;
-
-    // Constructor
+    /**
+     * Default, no-arg constructor
+     */
     public Logger() {
         this.logQueue = new List<LogRecord>();
-        Logger_Configuration__mdt config = getConfiguration();
-        this.currentLogLevel = getDefaultLogLevel(config);
-        this.currentLogTarget = getDefaultLogTarget(config);
+        this.config = new LoggerConfiguration();
     }
 
-    // Constructor with custom configuration name
+    /**
+     * Constructor with configuration name argument
+     * 
+     * @param configName The name of the logger configuration.
+     */
     public Logger(String configName) {
         this.logQueue = new List<LogRecord>();
-        Logger_Configuration__mdt config = getConfiguration(configName);
-        this.currentLogLevel = getDefaultLogLevel(config);
-        this.currentLogTarget = getDefaultLogTarget(config);
+        this.config = new LoggerConfiguration(configName);
     }
 
-    // Get configuration from custom metadata
-    private Logger_Configuration__mdt getConfiguration() {
-        return getConfiguration('Default');
+    /**
+     * Constructor with configuration instance argument
+     * 
+     * @param config An instance of LoggerConfiguration
+     */
+    public Logger(LoggerConfiguration config) {
+        if (config == null) {
+            throw new IllegalArgumentException('Logger Configuration must be provided');
+
+        }
+        this.logQueue = new List<LogRecord>();
+        this.config = config;
     }
 
-    private Logger_Configuration__mdt getConfiguration(String configName) {
-        try {
-            return [
-                SELECT Default_Log_Level__c, Log_Target__c
-                FROM Logger_Configuration__mdt
-                WHERE DeveloperName = :configName
-                LIMIT 1
-            ];
-        } catch (Exception e) {
-            return null;
+    /**
+     * Determines if a message at the given log level should be logged.
+     * Uses ordinal comparison to check if the level meets or exceeds the current threshold.
+     * 
+     * @param targetLogLevel The log level to check
+     * @return true if the level should be logged, false otherwise
+     */
+    private Boolean shouldLog(LoggingLevel targetLogLevel) {
+        if (targetLogLevel == LoggingLevel.NONE) {
+            return false;
+        }
+        else {
+            return targetLogLevel.ordinal() >= this.config.currentLogLevel.ordinal();
         }
     }
 
-    // Get default log level from custom metadata
-    private LogLevel getDefaultLogLevel(Logger_Configuration__mdt config) {
-        if (config != null && config.Default_Log_Level__c != null) {
-            try {
-                return LogLevel.valueOf(config.Default_Log_Level__c);
-            } catch (Exception e) {
-                // Invalid value, use default
-            }
-        }
-        return LogLevel.INFO;
-    }
-
-    // Get default log target from custom metadata
-    private LogTarget getDefaultLogTarget(Logger_Configuration__mdt config) {
-        if (config != null && config.Log_Target__c != null) {
-            if (config.Log_Target__c == 'System Debug') {
-                return LogTarget.SYSTEM_DEBUG;
-            } else if (config.Log_Target__c == 'Platform Event') {
-                return LogTarget.PLATFORM_EVENT;
-            } else if (config.Log_Target__c == 'Both') {
-                return LogTarget.BOTH;
-            }
-        }
-        return LogTarget.BOTH;
-    }
-
-    // Set the current log level
-    public void setLogLevel(LogLevel level) {
-        this.currentLogLevel = level;
-    }
-
-    // Get the current log level
-    public LogLevel getLogLevel() {
-        return this.currentLogLevel;
-    }
-
-    // Set the current log target
-    public void setLogTarget(LogTarget target) {
-        this.currentLogTarget = target;
-    }
-
-    // Get the current log target
-    public LogTarget getLogTarget() {
-        return this.currentLogTarget;
-    }
-
-    // Check if a log level should be logged
-    private Boolean shouldLog(LogLevel level) {
-        return level.ordinal() <= this.currentLogLevel.ordinal();
-    }
-
-    // Convert object to string message
+    /**
+     * Converts an object to a string representation for logging.
+     * Handles exceptions with detailed formatting including stack traces.
+     * 
+     * @param obj The object to convert (can be any type including Exception)
+     * @return String representation of the object, 'null' for null values
+     */
     private String objectToString(Object obj) {
         if (obj == null) {
             return 'null';
@@ -149,96 +96,160 @@ public inherited sharing class Logger {
         return String.valueOf(obj);
     }
 
-    // Format exception with detailed information
+    /**
+     * Formats an exception with detailed information including type, message, line number, and stack trace.
+     * 
+     * @param ex The exception to format
+     * @return Formatted string containing exception details
+     */
     private String formatException(Exception ex) {
-        StringBuilder sb = new StringBuilder();
-        sb.append('Exception Type: ').append(ex.getTypeName()).append('\n');
-        sb.append('Message: ').append(ex.getMessage()).append('\n');
-        sb.append('Line Number: ').append(ex.getLineNumber()).append('\n');
-        sb.append('Stack Trace:\n').append(ex.getStackTraceString());
-        return sb.toString();
+        Map<String, Object> exceptionMap = new Map<String, Object>();
+        exceptionMap.put('exceptionType', ex.getTypeName());
+        exceptionMap.put('message', ex.getMessage());
+        exceptionMap.put('lineNumber', ex.getLineNumber());
+        exceptionMap.put('stackTrace', ex.getStackTraceString());
+        return JSON.serialize(exceptionMap);
     }
 
-    // Add a log record to the queue or System.debug
-    private void addLogRecord(String level, Object obj) {
+    /**
+     * Adds a log record to the appropriate target(s) based on current configuration.
+     * Sends to System.debug and/or adds to the platform event queue.
+     * 
+     * @param targetLoglevel The log level as a string
+     * @param obj The object to log (will be converted to string)
+     */
+    private void addLogRecord(LoggingLevel targetLoglevel, Object obj) {
         String message = objectToString(obj);
         
-        // Handle System.debug
-        if (this.currentLogTarget == LogTarget.SYSTEM_DEBUG || this.currentLogTarget == LogTarget.BOTH) {
-            LoggingLevel loggingLevelEnum;
-            switch on level {
-                when 'ERROR' {
-                    loggingLevelEnum = LoggingLevel.ERROR;
-                }
-                when 'WARN' {
-                    loggingLevelEnum = LoggingLevel.WARN;
-                }
-                when 'INFO' {
-                    loggingLevelEnum = LoggingLevel.INFO;
-                }
-                when 'DEBUG' {
-                    loggingLevelEnum = LoggingLevel.DEBUG;
-                }
-                when 'FINE' {
-                    loggingLevelEnum = LoggingLevel.FINE;
-                }
-                when else {
-                    loggingLevelEnum = LoggingLevel.INFO;
-                }
-            }
-            System.debug(loggingLevelEnum, message);
+        // Handle System.debug()
+        if (this.config.currentLogTarget == LogTarget.SYSTEM_DEBUG || this.config.currentLogTarget == LogTarget.ALL) {
+            System.debug(targetLogLevel, message);
         }
 
         // Handle Platform Event queue
-        if (this.currentLogTarget == LogTarget.PLATFORM_EVENT || this.currentLogTarget == LogTarget.BOTH) {
-            LogRecord record = new LogRecord(level, message);
-            this.logQueue.add(record);
+        if (this.config.currentLogTarget == LogTarget.PLATFORM_EVENT || this.config.currentLogTarget == LogTarget.ALL) {
+            this.logQueue.add(new LogRecord(targetLoglevel.name().toUpperCase(), message));
         }
     }
-
-    // ERROR level logging
+    
+    /**
+     * Logs a message at ERROR level.
+     * Only logs if current log level is ERROR or higher.
+     * 
+     * @param obj The object to log
+     */
     public void error(Object obj) {
-        if (shouldLog(LogLevel.ERROR)) {
-            addLogRecord('ERROR', obj);
+        if (shouldLog(LoggingLevel.ERROR)) {
+            addLogRecord(LoggingLevel.ERROR, obj);
         }
     }
 
-    // WARN level logging
+    /**
+     * Logs a message at WARN level.
+     * Only logs if current log level is WARN or higher.
+     * 
+     * @param obj The object to log
+     */
     public void warn(Object obj) {
-        if (shouldLog(LogLevel.WARN)) {
-            addLogRecord('WARN', obj);
+        if (shouldLog(LoggingLevel.WARN)) {
+            addLogRecord(LoggingLevel.WARN, obj);
         }
     }
 
-    // INFO level logging
+    /**
+     * Logs a message at INFO level.
+     * Only logs if current log level is INFO or higher.
+     * 
+     * @param obj The object to log
+     */
     public void info(Object obj) {
-        if (shouldLog(LogLevel.INFO)) {
-            addLogRecord('INFO', obj);
+        if (shouldLog(LoggingLevel.INFO)) {
+            addLogRecord(LoggingLevel.INFO, obj);
         }
     }
 
-    // DEBUG level logging
+    /**
+     * Logs a message at DEBUG level.
+     * Only logs if current log level is DEBUG or higher.
+     * 
+     * @param obj The object to log
+     */
     public void debug(Object obj) {
-        if (shouldLog(LogLevel.DEBUG)) {
-            addLogRecord('DEBUG', obj);
+        if (shouldLog(LoggingLevel.DEBUG)) {
+            addLogRecord(LoggingLevel.DEBUG, obj);
         }
     }
 
-    // FINE level logging
+    /**
+     * Logs a message at FINE level.
+     * Only logs if current log level is FINE or higher.
+     * 
+     * @param obj The object to log
+     */
     public void fine(Object obj) {
-        if (shouldLog(LogLevel.FINE)) {
-            addLogRecord('FINE', obj);
+        if (shouldLog(LoggingLevel.FINE)) {
+            addLogRecord(LoggingLevel.FINE, obj);
         }
     }
 
-    // Flush all log records by publishing platform events
+    /**
+     * Logs a message at FINER level.
+     * Only logs if current log level is FINER or higher.
+     * 
+     * @param obj The object to log
+     */
+    public void finer(Object obj) {
+        if (shouldLog(LoggingLevel.FINER)) {
+            addLogRecord(LoggingLevel.FINER, obj);
+        }
+    }
+
+    /**
+     * Logs a message at FINEST level.
+     * Only logs if current log level is FINEST or higher.
+     * 
+     * @param obj The object to log
+     */
+    public void finest(Object obj) {
+        if (shouldLog(LoggingLevel.FINEST)) {
+            addLogRecord(LoggingLevel.FINEST, obj);
+        }
+    }
+
+    /**
+     * Logs a message using the default config options.
+     * 
+     * @param obj The object to log
+     */
+    public void log(Object obj) {
+        addLogRecord(this.config.currentLogLevel, obj);
+    }
+
+    /**
+     * Logs a message at the provided log level
+     * 
+     * @param obj The object to log
+     * @param targetLogLevel The target log level
+     */
+    public void log(Object obj, LoggingLevel targetLogLevel) {
+        if (targetLogLevel == LoggingLevel.NONE) {
+            return;
+        }
+        addLogRecord(targetLogLevel, obj);
+    }
+
+    /**
+     * Publishes all queued log records as platform events and clears the queue.
+     * Logs any publish errors to System.debug at ERROR level.
+     * 
+     * @return List of Database.SaveResult for each published event
+     */
     public List<Database.SaveResult> flush() {
         if (this.logQueue.isEmpty()) {
             return new List<Database.SaveResult>();
         }
 
         List<Log_Event__e> events = new List<Log_Event__e>();
-
         for (LogRecord record : this.logQueue) {
             Log_Event__e event = new Log_Event__e(
                 Level__c = record.level,
@@ -265,18 +276,169 @@ public inherited sharing class Logger {
         }
 
         // Clear the queue after publishing
-        this.logQueue.clear();
-        
+        this.clearQueue();
         return results;
     }
 
-    // Get the current queue size
+    /**
+     * Returns the number of log records currently in the queue waiting to be published.
+     * 
+     * @return The size of the log queue
+     */
     public Integer getQueueSize() {
         return this.logQueue.size();
     }
 
-    // Clear the queue without publishing
+    /**
+     * Clears all log records from the queue without publishing them.
+     * Useful for discarding logs in error scenarios or testing.
+     */
     public void clearQueue() {
         this.logQueue.clear();
+    }
+
+    /**
+     * Inner class to represent logger configuration
+     */
+    public class LoggerConfiguration {
+        /**
+         * Constants
+         */
+        public final LoggingLevel DEFAULT_LOG_LEVEL = LoggingLevel.WARN;
+        public final LogTarget DEFAULT_LOG_TARGET = LogTarget.ALL;
+
+        /**
+         * Properties
+         */
+        public final LoggingLevel currentLogLevel {get;private set;}
+        public final LogTarget currentLogTarget {get;private set;}
+
+        /**
+         * Default, no-arg constructor
+         */
+        public LoggerConfiguration() {
+            this.currentLogLevel = DEFAULT_LOG_LEVEL;
+            this.currentLogTarget = DEFAULT_LOG_TARGET;
+        }
+
+        /**
+         * Constructor with args
+         * 
+         * @param configName The name of the logger configuration record
+         */
+        public LoggerConfiguration(String configName) {
+            if (String.isBlank(configName)) {
+                throw new IllegalArgumentException('Config Name for logger configuration must be provided');
+            }
+
+            Logger_Configuration__mdt configRecord = Logger_Configuration__mdt.getInstance(configName);
+            if (configRecord == null) {
+                throw new QueryException('Logger Configuration not found for name: ' + configName);
+            }
+
+            // Set configuration properties
+            this.currentLogLevel = mapLogLevel(configRecord.Default_Log_Level__c);
+            this.currentLogTarget = mapLogTarget(configRecord.Default_Log_Target__c);
+        }
+
+        /**
+         * Maps the log level to the corresponding enum value.
+         * 
+         * @param targetLogLevel The target log level to be mapped
+         */
+        public LoggingLevel mapLogLevel(String targetLogLevel) {
+            if (String.isBlank(targetLogLevel)) {
+                throw new IllegalArgumentException('Log Level for logger configuration must be provided');
+            }
+
+            LoggingLevel newLoggingLevel; 
+            switch on targetLogLevel.toUpperCase() {
+                when 'NONE' {
+                    newLoggingLevel = LoggingLevel.NONE;
+                }
+                when 'ERROR' {
+                    newLoggingLevel = LoggingLevel.ERROR;
+                }
+                when 'WARN' {
+                    newLoggingLevel = LoggingLevel.WARN;
+                }
+                when 'INFO' {
+                    newLoggingLevel = LoggingLevel.INFO;
+                }
+                when 'DEBUG' {
+                    newLoggingLevel = LoggingLevel.DEBUG;
+                }
+                when 'FINE' {
+                    newLoggingLevel = LoggingLevel.FINE;
+                }
+                when 'FINER' {
+                    newLoggingLevel = LoggingLevel.FINER;
+                }
+                when 'FINEST' {
+                    newLoggingLevel = LoggingLevel.FINEST;
+                }
+                when else {
+                    newLoggingLevel = DEFAULT_LOG_LEVEL;
+                }
+            }
+            return newLoggingLevel;
+        }
+
+        /**
+         * Maps the log target to the corresponding enum value.
+         * 
+         * @param targetLogTarget The String value of the log target
+         */
+        public LogTarget mapLogTarget(String targetLogTarget) {
+            if (String.isBlank(targetLogTarget)) {
+                throw new IllegalArgumentException('Log Target for logger configuration must be provided');
+            }
+
+            LogTarget newLogTarget; 
+            switch on targetLogTarget.toUpperCase() {
+                when 'ALL' {
+                    newLogTarget = LogTarget.ALL;
+                }
+                when 'PLATFORM_EVENT' {
+                    newLogTarget = LogTarget.PLATFORM_EVENT;
+                }
+                when 'SYSTEM_DEBUG' {
+                    newLogTarget = LogTarget.SYSTEM_DEBUG;
+                }
+                when else {
+                    newLogTarget = DEFAULT_LOG_TARGET;
+                }
+            }
+            return newLogTarget;
+        }
+    }
+
+    /**
+     * Inner class to represent a log record
+     */
+    public class LogRecord {
+        public final DateTime timestamp;
+        public final String timezoneId;
+        public final String level;
+        public final String message;
+        public final String userId;
+        public final String quiddity;
+        public final String requestId;
+
+        /**
+         * Constructor with args
+         * 
+         * @param level The log level of the message
+         * @param message The body of the message
+         */
+        public LogRecord(String level, String message) {
+            this.timestamp = DateTime.now();
+            this.level = level;
+            this.message = message;
+            this.userId = UserInfo.getUserId();
+            this.timezoneId = UserInfo.getTimeZone().getID();
+            this.quiddity = Request.getCurrent().getQuiddity()?.name();
+            this.requestId = Request.getCurrent().getRequestId();
+        }
     }
 }

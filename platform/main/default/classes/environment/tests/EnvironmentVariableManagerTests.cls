@@ -8,6 +8,13 @@
 @IsTest
 private without sharing class EnvironmentVariableManagerTests {
     /**
+     * Constants
+     */
+    private static final String TEST_API_KEY_ENV = 'TEST_API_KEY';
+    private static final String TEST_ENDPOINT_ENV = 'TEST_ENDPOINT';
+    private static final String TEST_TIMEOUT_ENV = 'TEST_TIMEOUT';
+
+    /**
      * Test setup method to create test data
      */
     @TestSetup
@@ -16,17 +23,17 @@ private without sharing class EnvironmentVariableManagerTests {
         List<Environment_Variable__c> testVars = new List<Environment_Variable__c>();
         
         testVars.add(new Environment_Variable__c(
-            Name = 'TEST_API_KEY',
+            Name = TEST_API_KEY_ENV,
             Value__c = 'test-api-key-123'
         ));
         
         testVars.add(new Environment_Variable__c(
-            Name = 'TEST_ENDPOINT',
+            Name = TEST_ENDPOINT_ENV,
             Value__c = 'https://test.example.com/api'
         ));
         
         testVars.add(new Environment_Variable__c(
-            Name = 'TEST_TIMEOUT',
+            Name = TEST_TIMEOUT_ENV,
             Value__c = '30000'
         ));
         
@@ -80,11 +87,11 @@ private without sharing class EnvironmentVariableManagerTests {
         );
         
         Test.startTest();
-        EnvironmentVariableManager.EnvironmentVariable result = manager.get('TEST_API_KEY');
+        EnvironmentVariableManager.EnvironmentVariable result = manager.get(TEST_API_KEY_ENV);
         Test.stopTest();
         
         Assert.isNotNull(result, 'Should retrieve existing variable');
-        Assert.areEqual('TEST_API_KEY', result.key, 'Key should match');
+        Assert.areEqual(TEST_API_KEY_ENV, result.key, 'Key should match');
         Assert.areEqual('test-api-key-123', result.value, 'Value should match');
         Assert.areEqual(false, result.pendingDeployment, 'Should not be pending deployment');
     }
@@ -139,7 +146,7 @@ private without sharing class EnvironmentVariableManagerTests {
         Test.stopTest();
         
         Assert.isNotNull(result, 'Should retrieve variable after trimming whitespace');
-        Assert.areEqual('TEST_API_KEY', result.key, 'Key should be trimmed');
+        Assert.areEqual(TEST_API_KEY_ENV, result.key, 'Key should be trimmed');
     }
     
     /**
@@ -265,7 +272,7 @@ private without sharing class EnvironmentVariableManagerTests {
         );
         
         // Get existing variable (not pending)
-        manager.get('TEST_API_KEY');
+        manager.get(TEST_API_KEY_ENV);
         
         Test.startTest();
         EnvironmentVariableManager.DeploymentResult result = manager.deploy();
@@ -284,7 +291,7 @@ private without sharing class EnvironmentVariableManagerTests {
         );
         
         // Update existing variable
-        manager.put('TEST_API_KEY', 'updated-api-key-456');
+        manager.put(TEST_API_KEY_ENV, 'updated-api-key-456');
         
         Test.startTest();
         EnvironmentVariableManager.DeploymentResult result = manager.deploy();
@@ -293,7 +300,7 @@ private without sharing class EnvironmentVariableManagerTests {
         Assert.areEqual(1, result.deployedVariables.size(), 'Should deploy 1 variable');
         
         // Verify variable is updated
-        Environment_Variable__c persisted = Environment_Variable__c.getValues('TEST_API_KEY');
+        Environment_Variable__c persisted = Environment_Variable__c.getValues(TEST_API_KEY_ENV);
         Assert.areEqual('updated-api-key-456', persisted.Value__c, 'Variable should be updated');
     }
     
@@ -433,9 +440,9 @@ private without sharing class EnvironmentVariableManagerTests {
         Test.stopTest();
         
         // Should be able to retrieve test data created in @TestSetup
-        EnvironmentVariableManager.EnvironmentVariable var1 = manager.get('TEST_API_KEY');
-        EnvironmentVariableManager.EnvironmentVariable var2 = manager.get('TEST_ENDPOINT');
-        EnvironmentVariableManager.EnvironmentVariable var3 = manager.get('TEST_TIMEOUT');
+        EnvironmentVariableManager.EnvironmentVariable var1 = manager.get(TEST_API_KEY_ENV);
+        EnvironmentVariableManager.EnvironmentVariable var2 = manager.get(TEST_ENDPOINT_ENV);
+        EnvironmentVariableManager.EnvironmentVariable var3 = manager.get(TEST_TIMEOUT_ENV);
         
         Assert.isNotNull(var1, 'Should load existing variable 1');
         Assert.isNotNull(var2, 'Should load existing variable 2');
