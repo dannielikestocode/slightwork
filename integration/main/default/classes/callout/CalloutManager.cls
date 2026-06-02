@@ -1,68 +1,98 @@
 /**
- * Fluent API manager for building and executing HTTP callouts in Salesforce.
- * Provides a builder pattern for constructing HttpRequest instances with support for:
- * - Named Credentials
- * - Custom Metadata Configuration
- * - Query Parameters
- * - Request/Response Capture
+ * Provides a fluent interface for managing the lifecycle of an HTTP callout,
+ * including send operations.
  * 
- * @author Agentforce
+ * @author Dannie @ Wynforce
  * @since v66.0
- * @see HttpRequest
- * @see HttpResponse
+ * @see https://slightwork.dev/modules/integration/callout-manager.html
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_classes_restful_http_httprequest.htm For HttpRequest
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_classes_restful_http_httpresponse.htm For HttpResponse
  */
 public inherited sharing class CalloutManager {
     /**
+     * Constants
+     */
+    public static final Integer MAX_TIMEOUT = 120000; // In millis
+    public static final Integer MIN_TIMEOUT = 1; // In mills
+    public static final Integer DEFAULT_TIMEOUT = 10000; // 10 seconds millis (The Salesforce default: https://help.salesforce.com/s/articleView?id=000387845&type=1)
+    public static final Set<String> SUPPORTED_HTTP_METHODS = new Set<String>{'DELETE','GET','HEAD','PATCH','POST','PUT','TRACE'};
+
+    /**
      * Properties
      */
-    private String endpoint;
-    private String method;
-    private String body;
-    private Map<String, String> headers;
-    private Map<String, String> queryParams;
-    private Integer timeout;
-    private Boolean compressed;
-    private String clientCertificateName;
-    private Boolean captureRequestData;
-    private String namedCredential;
-    
-    // ─── Constants ───────────────────────────────────────────────────────
-    
-    private static final Integer DEFAULT_TIMEOUT = 120000; // 120 seconds
-    private static final String NAMED_CREDENTIAL_PREFIX = 'callout:';
-    
-    // ─── Constructor ─────────────────────────────────────────────────────
-    
+    private final HttpRequest request;
+    private Boolean captureRequestData {get;set;}
+    private String endpoint {get;set;}
+    private String method {get;set;}
+    private String body {get;set;}
+    private Integer timeout {get;set;}
+    private Boolean compressed {get;set;}
+    private String clientCertificateName {get;set;}
+    private String namedCredential {get;set;}
+  
     /**
-     * Creates a new CalloutManager instance.
-     * All configuration is performed via the fluent builder methods.
+     * Default, no-arg constructor
      */
     public CalloutManager() {
-        this.headers = new Map<String, String>();
-        this.queryParams = new Map<String, String>();
-        this.timeout = DEFAULT_TIMEOUT;
-        this.compressed = false;
+        this.request = new HttpRequest();
         this.captureRequestData = false;
-        this.method = 'GET';
+    }
+
+    /**
+     * Constructor with config name argument
+     * 
+     * @param configName The name of the Callout Configuration to retrieve
+     * @throws IllegalArgumentException when provided with a blank config name
+     * @throws QueryException when a config record cannot be found for the provided config name
+     */
+    public CalloutManager(String configName) {
+        if (String.isBlank(configName)) {
+            throw new IllegalArgumentException('Config Name for Callout Configuration must be provided');
+        }
+
+        Callout_Configuration__mdt configRecord = Callout_Configuration__mdt.getInstance(configName);
+        if (configRecord == null) {
+            throw new QueryException('Callout Configuration not found for name: ' + configName);
+        }
+
+        // Build request
+        this.request = new HttpRequest();
+        this.captureRequestData = false;
     }
     
-    // ─── Builder Methods: Core Configuration ────────────────────────────
-    
     /**
-     * Sets the endpoint URL for the callout.
-     * Can be a full URL or a path when using Named Credentials.
+     * Sets the full endpoint URL for the callout.
      * 
      * @param endpoint The endpoint URL or path
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException if endpoint is blank
-     * @example
-     * manager.withEndpoint('https://api.example.com/v1/users');
      */
-    public CalloutManager withEndpoint(String endpoint) {
+    public CalloutManager withFullEndpoint(String endpoint) {
         if (String.isBlank(endpoint)) {
             throw new IllegalArgumentException('Endpoint cannot be blank');
         }
-        this.endpoint = endpoint;
+        this.request.setEndpoint(endpoint);
+        return this;
+    }
+
+    /**
+     * Creates full endpoint from a combination of named credentials
+     * and partial endpoint
+     * 
+     * @param credentialName The named credential for the callout
+     * @param endpoint The endpoint URL or path
+     * @return This builder instance for method chaining
+     * @throws IllegalArgumentException if credential name or endpoint is blank
+     */
+    public CalloutManager withNamedEndpoint(String credentialName, String endpoint) {
+        if (String.isBlank(credentialName)) {
+            throw new IllegalArgumentException('Credential Name cannot be blank');            
+        }
+
+        if (String.isBlank(endpoint)) {
+            throw new IllegalArgumentException('Endpoint cannot be blank');
+        }
+        this.request.setEndpoint(credentialName + endpoint);
         return this;
     }
     
@@ -71,46 +101,58 @@ public inherited sharing class CalloutManager {
      * 
      * @param method The HTTP method (GET, POST, PUT, PATCH, DELETE, etc.)
      * @return This builder instance for method chaining
-     * @throws IllegalArgumentException if method is blank
-     * @example
-     * manager.withMethod('POST');
+     * @throws IllegalArgumentException if method is blank or provided method is not supported
      */
-    public CalloutManager withMethod(String method) {
+    public CalloutManager withHttpMethod(String method) {
         if (String.isBlank(method)) {
             throw new IllegalArgumentException('Method cannot be blank');
         }
-        this.method = method.toUpperCase();
+
+        method = method.toUpperCase();
+        if (!SUPPORTED_HTTP_METHODS.contains(method)) {
+            throw new IllegalArgumentException('Method provided is not supported');
+        }
+        this.request.setMethod(method);
         return this;
     }
     
     /**
-     * Sets the request body.
+     * Sets the request body. Checks type of body to set
+     * appropriate type on request.
      * 
      * @param body The request body (JSON, XML, or other format)
      * @return This builder instance for method chaining
-     * @example
-     * manager.withBody('{"name": "John Doe"}');
+     * @throws IllegalArgumentmentException when body is null
      */
-    public CalloutManager withBody(String body) {
-        this.body = body;
+    public CalloutManager withBody(Object body) {
+        if (body == null) {
+            throw new IllegalArgumentException('Body cannot be null');
+        }
+
+        if (body instanceof String) {
+            this.request.setBody(body);
+        }
+        else if (body instanceof Blob) {
+            this.request.setBodyAsBlob(body);
+        }
+        else {
+            this.request.setBody(JSON.serialize(body));
+        }
         return this;
     }
     
     /**
      * Sets the timeout in milliseconds.
-     * Maximum allowed is 120,000 milliseconds (120 seconds).
      * 
      * @param timeout Timeout in milliseconds
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException if timeout is invalid
-     * @example
-     * manager.withTimeout(60000); // 60 seconds
      */
     public CalloutManager withTimeout(Integer timeout) {
-        if (timeout == null || timeout <= 0 || timeout > 120000) {
+        if (timeout == null || timeout < MIN_TIMEOUT || timeout > MAX_TIMEOUT) {
             throw new IllegalArgumentException('Timeout must be between 1 and 120000 milliseconds');
         }
-        this.timeout = timeout;
+        this.request.setTimeout(timeout);
         return this;
     }
     
@@ -119,8 +161,6 @@ public inherited sharing class CalloutManager {
      * 
      * @param compressed True to enable compression
      * @return This builder instance for method chaining
-     * @example
-     * manager.withCompression(true);
      */
     public CalloutManager withCompression(Boolean compressed) {
         this.compressed = compressed != null ? compressed : false;
@@ -132,34 +172,34 @@ public inherited sharing class CalloutManager {
      * 
      * @param certificateName The name of the certificate in Salesforce
      * @return This builder instance for method chaining
-     * @example
-     * manager.withClientCertificate('MyCertificate');
+     * @throws IllegalArgumentException when certificate name is blank
+     * @see https://developer.salesforce.com/docs/atlas.en-us.262.0.apexcode.meta/apexcode/apex_callouts_client_certs_http.htm
      */
     public CalloutManager withClientCertificate(String certificateName) {
+        if (String.isBlank(certificateName)) {
+            throw new IllegalArgumentException('Certificate Name cannot be blank');
+        }
         this.clientCertificateName = certificateName;
         return this;
     }
-    
-    // ─── Builder Methods: Headers ────────────────────────────────────────
-    
+
     /**
      * Adds a single HTTP header to the request.
      * 
-     * @param name The header name
+     * @param key The header key
      * @param value The header value
      * @return This builder instance for method chaining
-     * @throws IllegalArgumentException if name or value is blank
-     * @example
-     * manager.withHeader('Content-Type', 'application/json');
+     * @throws IllegalArgumentException if key or value is blank
      */
-    public CalloutManager withHeader(String name, String value) {
-        if (String.isBlank(name)) {
-            throw new IllegalArgumentException('Header name cannot be blank');
+    public CalloutManager withHeader(String key, String value) {
+        if (String.isBlank(key)) {
+            throw new IllegalArgumentException('Header key cannot be blank');
         }
+
         if (String.isBlank(value)) {
             throw new IllegalArgumentException('Header value cannot be blank');
         }
-        this.headers.put(name, value);
+        this.request.setHeader(key, value);
         return this;
     }
     
@@ -169,11 +209,6 @@ public inherited sharing class CalloutManager {
      * @param headers Map of header names to values
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException if headers is null or empty
-     * @example
-     * manager.withHeaders(new Map<String, String>{
-     *     'Content-Type' => 'application/json',
-     *     'Accept' => 'application/json'
-     * });
      */
     public CalloutManager withHeaders(Map<String, String> headers) {
         if (headers == null || headers.isEmpty()) {
@@ -418,7 +453,7 @@ public inherited sharing class CalloutManager {
      * CalloutResult result = manager
      *     .withNamedCredential('MyAPI')
      *     .withEndpoint('/users')
-     *     .withMethod('GET')
+     *     .withHttpMethod('GET')
      *     .withRequestCapture(true)
      *     .execute();
      */
@@ -519,7 +554,7 @@ public inherited sharing class CalloutManager {
     public static CalloutManager get(String endpoint) {
         return new CalloutManager()
             .withEndpoint(endpoint)
-            .withMethod('GET');
+            .withHttpMethod('GET');
     }
     
     /**
@@ -535,7 +570,7 @@ public inherited sharing class CalloutManager {
     public static CalloutManager post(String endpoint) {
         return new CalloutManager()
             .withEndpoint(endpoint)
-            .withMethod('POST');
+            .withHttpMethod('POST');
     }
     
     /**
@@ -547,7 +582,7 @@ public inherited sharing class CalloutManager {
     public static CalloutManager put(String endpoint) {
         return new CalloutManager()
             .withEndpoint(endpoint)
-            .withMethod('PUT');
+            .withHttpMethod('PUT');
     }
     
     /**
@@ -559,7 +594,7 @@ public inherited sharing class CalloutManager {
     public static CalloutManager patch(String endpoint) {
         return new CalloutManager()
             .withEndpoint(endpoint)
-            .withMethod('PATCH');
+            .withHttpMethod('PATCH');
     }
     
     /**
@@ -571,7 +606,7 @@ public inherited sharing class CalloutManager {
     public static CalloutManager del(String endpoint) {
         return new CalloutManager()
             .withEndpoint(endpoint)
-            .withMethod('DELETE');
+            .withHttpMethod('DELETE');
     }
     
     /**
