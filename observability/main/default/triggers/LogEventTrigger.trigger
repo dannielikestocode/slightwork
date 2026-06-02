@@ -1,9 +1,15 @@
+/**
+ * Handles processing the Log Event type of published logs.
+ * 
+ * @author Dannie @ Wynforce
+ * @since v66.0
+ */
 trigger LogEventTrigger on Log_Event__e (after insert) {
     List<Log__c> logsToInsert = new List<Log__c>();
 
     for (Log_Event__e event : Trigger.new) {
         Log__c logRecord = new Log__c(
-            Level__c = event.Level__c,
+            Log_Level__c = event.Log_Level__c,
             Message__c = event.Message__c,
             User_Id__c = event.User_Id__c,
             Timezone_Id__c = event.Timezone_Id__c,

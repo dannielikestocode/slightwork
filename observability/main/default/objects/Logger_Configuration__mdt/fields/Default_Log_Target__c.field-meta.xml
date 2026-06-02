@@ -14,12 +14,12 @@
             <value>
                 <fullName>SYSTEM_DEBUG</fullName>
                 <default>false</default>
-                <label>SYSTEM DEBUG</label>
+                <label>SYSTEM_DEBUG</label>
             </value>
             <value>
                 <fullName>PLATFORM_EVENT</fullName>
                 <default>false</default>
-                <label>PLATFORM EVENT</label>
+                <label>PLATFORM_EVENT</label>
             </value>
             <value>
                 <fullName>ALL</fullName>

@@ -2,9 +2,22 @@
  * Provides a robust utility for logging messages both synchronously
  * and asynchronously.
  * 
+ * Log Level Ordinal values (The higher the severity, the higher the ordinal value):
+ * 
+ * LoggingLevel.ERROR: 8
+ * LoggingLevel.WARN: 7
+ * LoggingLevel.INFO: 6
+ * LoggingLevel.DEBUG: 5
+ * LoggingLevel.FINE: 4
+ * LoggingLevel.FINER: 3
+ * LoggingLevel.FINEST: 2
+ * LoggingLevel.NONE: 0
+ * 
  * @author Dannie @ Wynforce
  * @since v66.0
  * @see https://slightwork.dev/modules/observability/logger.html
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_enum_System_LoggingLevel.htm For available log levels
+ * @see https://help.salesforce.com/s/articleView?id=platform.code_setting_debug_log_levels.htm&type=5 For debug log types
  */
 public inherited sharing class Logger {
     /**
@@ -31,18 +44,8 @@ public inherited sharing class Logger {
      * Default, no-arg constructor
      */
     public Logger() {
-        this.logQueue = new List<LogRecord>();
         this.config = new LoggerConfiguration();
-    }
-
-    /**
-     * Constructor with configuration name argument
-     * 
-     * @param configName The name of the logger configuration.
-     */
-    public Logger(String configName) {
         this.logQueue = new List<LogRecord>();
-        this.config = new LoggerConfiguration(configName);
     }
 
     /**
@@ -55,8 +58,8 @@ public inherited sharing class Logger {
             throw new IllegalArgumentException('Logger Configuration must be provided');
 
         }
-        this.logQueue = new List<LogRecord>();
         this.config = config;
+        this.logQueue = new List<LogRecord>();
     }
 
     /**
@@ -252,7 +255,7 @@ public inherited sharing class Logger {
         List<Log_Event__e> events = new List<Log_Event__e>();
         for (LogRecord record : this.logQueue) {
             Log_Event__e event = new Log_Event__e(
-                Level__c = record.level,
+                Log_Level__c = record.logLevel,
                 Message__c = record.message,
                 User_Id__c = record.userId,
                 Timezone_Id__c = record.timezoneId,
@@ -419,7 +422,7 @@ public inherited sharing class Logger {
     public class LogRecord {
         public final DateTime timestamp;
         public final String timezoneId;
-        public final String level;
+        public final String logLevel;
         public final String message;
         public final String userId;
         public final String quiddity;
@@ -428,12 +431,12 @@ public inherited sharing class Logger {
         /**
          * Constructor with args
          * 
-         * @param level The log level of the message
+         * @param logLevel The log level of the message
          * @param message The body of the message
          */
-        public LogRecord(String level, String message) {
+        public LogRecord(String logLevel, String message) {
             this.timestamp = DateTime.now();
-            this.level = level;
+            this.logLevel = logLevel;
             this.message = message;
             this.userId = UserInfo.getUserId();
             this.timezoneId = UserInfo.getTimeZone().getID();

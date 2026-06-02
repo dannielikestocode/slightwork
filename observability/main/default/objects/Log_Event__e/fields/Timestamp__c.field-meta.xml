@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Timestamp__c</fullName>
-    <externalId>false</externalId>
+    <description>The date/time when the log message was published</description>
+    <inlineHelpText>The date/time when the log message was published</inlineHelpText>
     <isFilteringDisabled>false</isFilteringDisabled>
     <isNameField>false</isNameField>
     <isSortingDisabled>false</isSortingDisabled>

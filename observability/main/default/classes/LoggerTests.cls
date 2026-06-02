@@ -4,6 +4,7 @@
  * @author Dannie @ Wynforce
  * @since v66.0
  * @see Logger.cls
+ * @see LogEventTrigger.trigger
  */
 @IsTest
 private without sharing class LoggerTests {
@@ -11,24 +12,11 @@ private without sharing class LoggerTests {
     @IsTest
     private static void testDefaultConstructor() {
         Test.startTest();
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         Test.stopTest();
 
-        Assert.isNotNull(logger, 'Logger instance should not be null');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after initialization');
-    }
-
-    @IsTest
-    private static void testConstructorWithConfigName_ValidConfig() {
-        Test.startTest();
-        try {
-            Logger logger = new Logger(Logger.DEFAULT_CONFIGURATION_NAME);
-            Assert.isNotNull(logger, 'Logger instance should not be null');
-        } catch (Exception ex) {
-            // Expected if metadata record doesn't exist in test context
-            Assert.isInstanceOfType(ex, QueryException.class, 'Should throw QueryException if config not found');
-        }
-        Test.stopTest();
+        Assert.isNotNull(testLogger, 'Logger instance should not be null');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after initialization');
     }
 
     @IsTest
@@ -36,222 +24,222 @@ private without sharing class LoggerTests {
         Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
         
         Test.startTest();
-        Logger logger = new Logger(config);
+        Logger testLogger = new Logger(config);
         Test.stopTest();
 
-        Assert.isNotNull(logger, 'Logger instance should not be null');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after initialization');
+        Assert.isNotNull(testLogger, 'Logger instance should not be null');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after initialization');
     }
 
     @IsTest
     private static void testErrorLogging_PlatformEvent() {
         Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
-        Logger logger = new Logger(config);
+        Logger testLogger = new Logger(config);
         String testMessage = 'Test error message';
 
         Test.startTest();
-        logger.error(testMessage);
+        testLogger.error(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'One log record should be in queue');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'One log record should be in queue');
     }
 
     @IsTest
     private static void testWarnLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test warning message';
 
         Test.startTest();
-        logger.warn(testMessage);
+        testLogger.warn(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'One log record should be in queue');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'One log record should be in queue');
     }
 
     @IsTest
     private static void testInfoLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test info message';
 
         Test.startTest();
-        logger.info(testMessage);
+        testLogger.info(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'No log records should be in queue');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'No log records should be in queue');
     }
 
     @IsTest
     private static void testDebugLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test debug message';
 
         Test.startTest();
-        logger.debug(testMessage);
+        testLogger.debug(testMessage);
         Test.stopTest();
 
         // Debug level might not log depending on default config (WARN)
         // With default WARN level, DEBUG won't log
-        Assert.areEqual(0, logger.getQueueSize(), 'Debug should not log with default WARN level');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Debug should not log with default WARN level');
     }
 
     @IsTest
     private static void testFineLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test fine message';
 
         Test.startTest();
-        logger.fine(testMessage);
+        testLogger.fine(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'Fine should not log with default WARN level');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Fine should not log with default WARN level');
     }
 
     @IsTest
     private static void testFinerLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test finer message';
 
         Test.startTest();
-        logger.finer(testMessage);
+        testLogger.finer(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'Finer should not log with default WARN level');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Finer should not log with default WARN level');
     }
 
     @IsTest
     private static void testFinestLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test finest message';
 
         Test.startTest();
-        logger.finest(testMessage);
+        testLogger.finest(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'Finest should not log with default WARN level');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Finest should not log with default WARN level');
     }
 
     @IsTest
     private static void testLogWithDefaultLevel() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test log message';
 
         Test.startTest();
-        logger.log(testMessage);
+        testLogger.log(testMessage);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'One log record should be in queue');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'One log record should be in queue');
     }
 
     @IsTest
     private static void testLogWithSpecifiedLevel() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         String testMessage = 'Test log message with level';
 
         Test.startTest();
-        logger.log(testMessage, LoggingLevel.ERROR);
+        testLogger.log(testMessage, LoggingLevel.ERROR);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'One log record should be in queue');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'One log record should be in queue');
     }
 
     @IsTest
     private static void testLoggingNullObject() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
-        logger.error(null);
+        testLogger.error(null);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'Null object should be logged as "null"');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'Null object should be logged as "null"');
     }
 
     @IsTest
     private static void testLoggingException() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         Exception testException = new DmlException('Test DML exception');
 
         Test.startTest();
-        logger.error(testException);
+        testLogger.error(testException);
         Test.stopTest();
 
-        Assert.areEqual(1, logger.getQueueSize(), 'Exception should be logged');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'Exception should be logged');
     }
 
     @IsTest
     private static void testFlush_PublishesEvents() {
-        Logger logger = new Logger();
-        logger.error('Error message 1');
-        logger.warn('Warning message 2');
-        logger.error('Error message 3');
+        Logger testLogger = new Logger();
+        testLogger.error('Error message 1');
+        testLogger.warn('Warning message 2');
+        testLogger.error('Error message 3');
 
-        Assert.areEqual(3, logger.getQueueSize(), 'Three messages should be queued');
+        Assert.areEqual(3, testLogger.getQueueSize(), 'Three messages should be queued');
 
         Test.startTest();
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         Test.stopTest();
 
         Assert.areEqual(3, results.size(), 'Should return 3 save results');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after flush');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after flush');
     }
 
     @IsTest
     private static void testFlush_EmptyQueue() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         Test.stopTest();
 
         Assert.areEqual(0, results.size(), 'Should return empty list for empty queue');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should remain empty');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should remain empty');
     }
 
     @IsTest
     private static void testGetQueueSize() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'Initial queue size should be 0');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Initial queue size should be 0');
 
-        logger.error('Message 1');
-        Assert.areEqual(1, logger.getQueueSize(), 'Queue size should be 1');
+        testLogger.error('Message 1');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'Queue size should be 1');
 
-        logger.warn('Message 2');
-        Assert.areEqual(2, logger.getQueueSize(), 'Queue size should be 2');
+        testLogger.warn('Message 2');
+        Assert.areEqual(2, testLogger.getQueueSize(), 'Queue size should be 2');
 
-        logger.error('Message 3');
-        Assert.areEqual(3, logger.getQueueSize(), 'Queue size should be 3');
+        testLogger.error('Message 3');
+        Assert.areEqual(3, testLogger.getQueueSize(), 'Queue size should be 3');
     }
 
     @IsTest
     private static void testClearQueue() {
-        Logger logger = new Logger();
-        logger.error('Message 1');
-        logger.warn('Message 2');
+        Logger testLogger = new Logger();
+        testLogger.error('Message 1');
+        testLogger.warn('Message 2');
 
-        Assert.areEqual(2, logger.getQueueSize(), 'Queue should have 2 messages');
+        Assert.areEqual(2, testLogger.getQueueSize(), 'Queue should have 2 messages');
 
         Test.startTest();
-        logger.clearQueue();
+        testLogger.clearQueue();
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after clear');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after clear');
     }
 
     @IsTest
     private static void testMultipleLogsAndFlush() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
         for (Integer i = 0; i < 10; i++) {
-            logger.error('Error message ' + i);
+            testLogger.error('Error message ' + i);
         }
-        Assert.areEqual(10, logger.getQueueSize(), 'Queue should have 10 messages');
+        Assert.areEqual(10, testLogger.getQueueSize(), 'Queue should have 10 messages');
 
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         Test.stopTest();
 
         Assert.areEqual(10, results.size(), 'Should publish 10 events');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after flush');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after flush');
     }
 
     @IsTest
@@ -266,6 +254,23 @@ private without sharing class LoggerTests {
         // Ensure current properties match the constants
         Assert.areEqual(config.DEFAULT_LOG_LEVEL, config.currentLogLevel, 'currentLogLevel should equal DEFAULT_LOG_LEVEL');
         Assert.areEqual(config.DEFAULT_LOG_TARGET, config.currentLogTarget, 'currentLogTarget should equal DEFAULT_LOG_TARGET');
+    }
+
+    @IsTest
+    private static void testInstantiateLoggerWithDefaultConfigName() {
+        // Use the public constant default name to instantiate a Logger and verify it constructs correctly
+        Test.startTest();
+        try {
+            Logger.LoggerConfiguration config = new Logger.LoggerConfiguration(Logger.DEFAULT_CONFIGURATION_NAME);
+            Logger testLogger = new Logger(config);
+            Assert.isNotNull(testLogger, 'Logger instance should be created using default configuration name');
+            // Default config should be applied; queue should start empty
+            Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after initialization');
+        } catch (Exception ex) {
+            // If metadata isn't present in the test context, ensure we fail with a QueryException as a known fallback
+            Assert.isInstanceOfType(ex, QueryException.class, 'Missing metadata should result in QueryException when using default config name');
+        }
+        Test.stopTest();
     }
 
     @IsTest
@@ -398,7 +403,7 @@ private without sharing class LoggerTests {
         Logger.LogRecord record = new Logger.LogRecord(testLevel, testMessage);
         Test.stopTest();
 
-        Assert.areEqual(testLevel, record.level, 'Level should match');
+        Assert.areEqual(testLevel, record.LogLevel, 'Log Level should match');
         Assert.areEqual(testMessage, record.message, 'Message should match');
         Assert.isNotNull(record.timestamp, 'Timestamp should be set');
         Assert.isNotNull(record.userId, 'User ID should be set');
@@ -408,54 +413,54 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testShouldLog_NoneLevel() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
         // NONE level should never log
-        logger.log('Test', LoggingLevel.NONE);
+        testLogger.log('Test', LoggingLevel.NONE);
         Test.stopTest();
 
-        Assert.areEqual(0, logger.getQueueSize(), 'NONE level should not create log records');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'NONE level should not create log records');
     }
 
     @IsTest
     private static void testLogging_DifferentObjectTypes() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
-        logger.error('String message');
-        logger.error(123);
-        logger.error(true);
-        logger.error(new List<String>{'item1', 'item2'});
-        logger.error(new Map<String, String>{'key' => 'value'});
+        testLogger.error('String message');
+        testLogger.error(123);
+        testLogger.error(true);
+        testLogger.error(new List<String>{'item1', 'item2'});
+        testLogger.error(new Map<String, String>{'key' => 'value'});
         Test.stopTest();
 
-        Assert.areEqual(5, logger.getQueueSize(), 'All object types should be logged');
+        Assert.areEqual(5, testLogger.getQueueSize(), 'All object types should be logged');
     }
 
     @IsTest
     private static void testExceptionFormatting() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
         
         try {
             // Generate a real exception with stack trace
             Integer result = 1 / 0;
         } catch (Exception ex) {
             Test.startTest();
-            logger.error(ex);
+            testLogger.error(ex);
             Test.stopTest();
 
-            Assert.areEqual(1, logger.getQueueSize(), 'Exception should be logged');
+            Assert.areEqual(1, testLogger.getQueueSize(), 'Exception should be logged');
         }
     }
 
     @IsTest
     private static void testFlush_SuccessfulPublish() {
-        Logger logger = new Logger();
-        logger.error('Test message');
+        Logger testLogger = new Logger();
+        testLogger.error('Test message');
 
         Test.startTest();
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         Test.stopTest();
 
         Assert.areEqual(1, results.size(), 'Should return one result');
@@ -466,47 +471,47 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testCompleteLoggingWorkflow() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
         // Log various messages
-        logger.error('Critical error occurred');
-        logger.warn('Warning: Resource limit approaching');
-        logger.info('Process completed successfully');
+        testLogger.error('Critical error occurred');
+        testLogger.warn('Warning: Resource limit approaching');
+        testLogger.info('Process completed successfully');
         
         // Check queue
-        Integer queueSize = logger.getQueueSize();
+        Integer queueSize = testLogger.getQueueSize();
         Assert.areEqual(2, queueSize, 'Should have 2 messages queued');
         
         // Flush logs
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         
         // Verify flush
         Assert.areEqual(2, results.size(), 'Should publish 2 events');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty');
         
         // Log again after flush
-        logger.error('New error after flush');
-        Assert.areEqual(1, logger.getQueueSize(), 'Should have 1 new message');
+        testLogger.error('New error after flush');
+        Assert.areEqual(1, testLogger.getQueueSize(), 'Should have 1 new message');
         Test.stopTest();
     }
 
     @IsTest
     private static void testBulkLogging() {
-        Logger logger = new Logger();
+        Logger testLogger = new Logger();
 
         Test.startTest();
         for (Integer i = 0; i < 100; i++) {
-            logger.error('Bulk message ' + i);
+            testLogger.error('Bulk message ' + i);
         }
         
-        Assert.areEqual(100, logger.getQueueSize(), 'Should queue 100 messages');
+        Assert.areEqual(100, testLogger.getQueueSize(), 'Should queue 100 messages');
         
-        List<Database.SaveResult> results = logger.flush();
+        List<Database.SaveResult> results = testLogger.flush();
         Test.stopTest();
 
         Assert.areEqual(100, results.size(), 'Should publish 100 events');
-        Assert.areEqual(0, logger.getQueueSize(), 'Queue should be empty after bulk flush');
+        Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after bulk flush');
     }
 
     @IsTest
@@ -527,5 +532,49 @@ private without sharing class LoggerTests {
         // Verify we can still log after clearing
         logger.error('New message after clear');
         Assert.areEqual(1, logger.getQueueSize(), 'Should be able to log after clear');
+    }
+
+    @IsTest
+    private static void testLogEventTrigger_PersistSingleRecord() {
+        // Publish a small number of events
+        Logger logger = new Logger();
+        logger.warn('Trigger persistence test - single 1');
+        logger.info('Trigger persistence test - single 2');
+
+        // Flush to publish platform events (handled by trigger to persist Log__c)
+        Test.startTest();
+        logger.flush();
+        Test.stopTest();
+
+        // Query persisted log records
+        List<Log__c> persisted = [
+            SELECT Id, Log_Level__c, Message__c 
+            FROM Log__c
+        ];
+
+        // Assert persisted size. There should only be 1 log record due to
+        // the default WARN log level (ignoring the INFO log)
+        Assert.areEqual(1, persisted.size(), 'There should be 1 log record created');
+    }
+
+    @IsTest
+    private static void testLogEventTrigger_PersistBulkRecords() {
+        // Publish a bulk set of events
+        Logger logger = new Logger();
+        for (Integer i = 0; i < 25; i++) {
+            logger.warn('Trigger bulk persistence test - ' + i);
+        }
+
+        Test.startTest();
+        logger.flush();
+        Test.stopTest();
+
+        List<Log__c> persisted = [
+            SELECT Id, Log_Level__c, Message__c 
+            FROM Log__c
+        ];
+
+        // Assertions
+        Assert.areEqual(25, persisted.size(), 'There should be 25 log records created');
     }
 }
