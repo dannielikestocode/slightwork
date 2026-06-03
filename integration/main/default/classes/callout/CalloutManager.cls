@@ -368,7 +368,7 @@ public inherited sharing class CalloutManager {
      * @throws IllegalStateException if required fields are missing
      */
     public HttpRequest buildRequest() {
-        validateRequest();
+        validateState();
         
         // Build the request from manager properties
         HttpRequest request = new HttpRequest();
@@ -423,7 +423,7 @@ public inherited sharing class CalloutManager {
      * 
      * @throws IllegalStateException if the state of the request is invalid
      */
-    private void validateRequest() {
+    private void validateState() {
         if (
             (String.isNotBlank(this.body) && this.blobBody != null) ||
             (String.isNotBlank(this.body) && this.documentBody != null) ||

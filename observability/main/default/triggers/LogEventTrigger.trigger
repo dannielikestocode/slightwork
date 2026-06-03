@@ -1,5 +1,5 @@
 /**
- * Handles processing the Log Event type of published logs.
+ * Handles processing the Log Event type for published logs.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
