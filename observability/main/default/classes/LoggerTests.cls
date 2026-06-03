@@ -8,7 +8,7 @@
  */
 @IsTest
 private without sharing class LoggerTests {
-    
+
     @IsTest
     private static void testDefaultConstructor() {
         Test.startTest();
@@ -21,7 +21,7 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testConstructorWithConfigInstance() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
         
         Test.startTest();
         Logger testLogger = new Logger(config);
@@ -33,7 +33,7 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testErrorLogging_PlatformEvent() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
         Logger testLogger = new Logger(config);
         String testMessage = 'Test error message';
 
@@ -245,83 +245,70 @@ private without sharing class LoggerTests {
     @IsTest
     private static void testLoggerConfiguration_DefaultConstants() {
         // Verify the DEFAULT_LOG_LEVEL and DEFAULT_LOG_TARGET constants and that the default ctor uses them
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         // Access TestVisible constants via a new instance
-        Assert.areEqual(LoggingLevel.WARN, config.DEFAULT_LOG_LEVEL, 'DEFAULT_LOG_LEVEL constant should be WARN');
-        Assert.areEqual(Logger.LogTarget.ALL, config.DEFAULT_LOG_TARGET, 'DEFAULT_LOG_TARGET constant should be ALL');
+        Assert.areEqual(LoggingLevel.WARN, Logger.DEFAULT_LOG_LEVEL, 'DEFAULT_LOG_LEVEL constant should be WARN');
+        Assert.areEqual(Logger.LogTarget.ALL, Logger.DEFAULT_LOG_TARGET, 'DEFAULT_LOG_TARGET constant should be ALL');
 
         // Ensure current properties match the constants
-        Assert.areEqual(config.DEFAULT_LOG_LEVEL, config.currentLogLevel, 'currentLogLevel should equal DEFAULT_LOG_LEVEL');
-        Assert.areEqual(config.DEFAULT_LOG_TARGET, config.currentLogTarget, 'currentLogTarget should equal DEFAULT_LOG_TARGET');
+        Assert.areEqual(Logger.DEFAULT_LOG_LEVEL, testLogger.currentLogLevel, 'currentLogLevel should equal DEFAULT_LOG_LEVEL');
+        Assert.areEqual(Logger.DEFAULT_LOG_TARGET, testLogger.currentLogTarget, 'currentLogTarget should equal DEFAULT_LOG_TARGET');
     }
 
     @IsTest
     private static void testInstantiateLoggerWithDefaultConfigName() {
-        // Use the public constant default name to instantiate a Logger and verify it constructs correctly
         Test.startTest();
         try {
-            Logger.LoggerConfiguration config = new Logger.LoggerConfiguration(Logger.DEFAULT_CONFIGURATION_NAME);
+            Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
             Logger testLogger = new Logger(config);
-            Assert.isNotNull(testLogger, 'Logger instance should be created using default configuration name');
+            Assert.isNotNull(testLogger, 'Logger instance should be created using default configuration');
             // Default config should be applied; queue should start empty
             Assert.areEqual(0, testLogger.getQueueSize(), 'Queue should be empty after initialization');
         } catch (Exception ex) {
             // If metadata isn't present in the test context, ensure we fail with a QueryException as a known fallback
-            Assert.isInstanceOfType(ex, QueryException.class, 'Missing metadata should result in QueryException when using default config name');
+            Assert.isInstanceOfType(ex, QueryException.class, 'Missing metadata should result in QueryException when using default config');
         }
         Test.stopTest();
-    }
-
-    @IsTest
-    private static void testLoggerConfiguration_BlankConfigName() {
-        Boolean exceptionThrown = false;
-
-        Test.startTest();
-        try {
-            Logger.LoggerConfiguration config = new Logger.LoggerConfiguration('');
-        } catch (IllegalArgumentException ex) {
-            exceptionThrown = true;
-            Assert.isTrue(ex.getMessage().contains('Config Name'), 'Exception should mention config name');
-        }
-        Test.stopTest();
-
-        Assert.isTrue(exceptionThrown, 'IllegalArgumentException should be thrown for blank config name');
     }
 
     @IsTest
     private static void testMapLogLevel_ValidLevels() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        Assert.areEqual(LoggingLevel.NONE, config.mapLogLevel('NONE'), 'Should map NONE');
-        Assert.areEqual(LoggingLevel.ERROR, config.mapLogLevel('ERROR'), 'Should map ERROR');
-        Assert.areEqual(LoggingLevel.WARN, config.mapLogLevel('WARN'), 'Should map WARN');
-        Assert.areEqual(LoggingLevel.INFO, config.mapLogLevel('INFO'), 'Should map INFO');
-        Assert.areEqual(LoggingLevel.DEBUG, config.mapLogLevel('DEBUG'), 'Should map DEBUG');
-        Assert.areEqual(LoggingLevel.FINE, config.mapLogLevel('FINE'), 'Should map FINE');
-        Assert.areEqual(LoggingLevel.FINER, config.mapLogLevel('FINER'), 'Should map FINER');
-        Assert.areEqual(LoggingLevel.FINEST, config.mapLogLevel('FINEST'), 'Should map FINEST');
+        Assert.areEqual(LoggingLevel.NONE, testLogger.mapLogLevel('NONE'), 'Should map NONE');
+        Assert.areEqual(LoggingLevel.ERROR, testLogger.mapLogLevel('ERROR'), 'Should map ERROR');
+        Assert.areEqual(LoggingLevel.WARN, testLogger.mapLogLevel('WARN'), 'Should map WARN');
+        Assert.areEqual(LoggingLevel.INFO, testLogger.mapLogLevel('INFO'), 'Should map INFO');
+        Assert.areEqual(LoggingLevel.DEBUG, testLogger.mapLogLevel('DEBUG'), 'Should map DEBUG');
+        Assert.areEqual(LoggingLevel.FINE, testLogger.mapLogLevel('FINE'), 'Should map FINE');
+        Assert.areEqual(LoggingLevel.FINER, testLogger.mapLogLevel('FINER'), 'Should map FINER');
+        Assert.areEqual(LoggingLevel.FINEST, testLogger.mapLogLevel('FINEST'), 'Should map FINEST');
         Test.stopTest();
     }
 
     @IsTest
     private static void testMapLogLevel_CaseInsensitive() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        Assert.areEqual(LoggingLevel.ERROR, config.mapLogLevel('error'), 'Should handle lowercase');
-        Assert.areEqual(LoggingLevel.WARN, config.mapLogLevel('WaRn'), 'Should handle mixed case');
-        Assert.areEqual(LoggingLevel.INFO, config.mapLogLevel('INFO'), 'Should handle uppercase');
+        Assert.areEqual(LoggingLevel.ERROR, testLogger.mapLogLevel('error'), 'Should handle lowercase');
+        Assert.areEqual(LoggingLevel.WARN, testLogger.mapLogLevel('WaRn'), 'Should handle mixed case');
+        Assert.areEqual(LoggingLevel.INFO, testLogger.mapLogLevel('INFO'), 'Should handle uppercase');
         Test.stopTest();
     }
 
     @IsTest
     private static void testMapLogLevel_InvalidLevel() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        LoggingLevel result = config.mapLogLevel('INVALID_LEVEL');
+        LoggingLevel result = testLogger.mapLogLevel('INVALID_LEVEL');
         Test.stopTest();
 
         Assert.areEqual(LoggingLevel.WARN, result, 'Invalid level should return default WARN');
@@ -329,12 +316,13 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testMapLogLevel_BlankThrowsException() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
         Boolean exceptionThrown = false;
 
         Test.startTest();
         try {
-            config.mapLogLevel('');
+            testLogger.mapLogLevel('');
         } catch (IllegalArgumentException ex) {
             exceptionThrown = true;
             Assert.isTrue(ex.getMessage().contains('Log Level'), 'Exception should mention log level');
@@ -346,32 +334,35 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testMapLogTarget_ValidTargets() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        Assert.areEqual(Logger.LogTarget.ALL, config.mapLogTarget('ALL'), 'Should map ALL');
-        Assert.areEqual(Logger.LogTarget.PLATFORM_EVENT, config.mapLogTarget('PLATFORM_EVENT'), 'Should map PLATFORM_EVENT');
-        Assert.areEqual(Logger.LogTarget.SYSTEM_DEBUG, config.mapLogTarget('SYSTEM_DEBUG'), 'Should map SYSTEM_DEBUG');
+        Assert.areEqual(Logger.LogTarget.ALL, testLogger.mapLogTarget('ALL'), 'Should map ALL');
+        Assert.areEqual(Logger.LogTarget.PLATFORM_EVENT, testLogger.mapLogTarget('PLATFORM_EVENT'), 'Should map PLATFORM_EVENT');
+        Assert.areEqual(Logger.LogTarget.SYSTEM_DEBUG, testLogger.mapLogTarget('SYSTEM_DEBUG'), 'Should map SYSTEM_DEBUG');
         Test.stopTest();
     }
 
     @IsTest
     private static void testMapLogTarget_CaseInsensitive() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        Assert.areEqual(Logger.LogTarget.ALL, config.mapLogTarget('all'), 'Should handle lowercase');
-        Assert.areEqual(Logger.LogTarget.PLATFORM_EVENT, config.mapLogTarget('platform_event'), 'Should handle lowercase');
-        Assert.areEqual(Logger.LogTarget.SYSTEM_DEBUG, config.mapLogTarget('SyStEm_DeBuG'), 'Should handle mixed case');
+        Assert.areEqual(Logger.LogTarget.ALL, testLogger.mapLogTarget('all'), 'Should handle lowercase');
+        Assert.areEqual(Logger.LogTarget.PLATFORM_EVENT, testLogger.mapLogTarget('platform_event'), 'Should handle lowercase');
+        Assert.areEqual(Logger.LogTarget.SYSTEM_DEBUG, testLogger.mapLogTarget('SyStEm_DeBuG'), 'Should handle mixed case');
         Test.stopTest();
     }
 
     @IsTest
     private static void testMapLogTarget_InvalidTarget() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
 
         Test.startTest();
-        Logger.LogTarget result = config.mapLogTarget('INVALID_TARGET');
+        Logger.LogTarget result = testLogger.mapLogTarget('INVALID_TARGET');
         Test.stopTest();
 
         Assert.areEqual(Logger.LogTarget.ALL, result, 'Invalid target should return default ALL');
@@ -379,12 +370,13 @@ private without sharing class LoggerTests {
 
     @IsTest
     private static void testMapLogTarget_BlankThrowsException() {
-        Logger.LoggerConfiguration config = new Logger.LoggerConfiguration();
+        Logger_Configuration__mdt config = Logger.getDefaultConfiguration();
+        Logger testLogger = new Logger(config);
         Boolean exceptionThrown = false;
 
         Test.startTest();
         try {
-            config.mapLogTarget('');
+            testLogger.mapLogTarget('');
         } catch (IllegalArgumentException ex) {
             exceptionThrown = true;
             Assert.isTrue(ex.getMessage().contains('Log Target'), 'Exception should mention log target');

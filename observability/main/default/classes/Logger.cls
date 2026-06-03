@@ -23,8 +23,8 @@ public inherited sharing class Logger {
     /**
      * Constants
      */
-    private static final LoggingLevel DEFAULT_LOG_LEVEL = LoggingLevel.WARN;
-    private static final LogTarget DEFAULT_LOG_TARGET = LogTarget.ALL;
+    @TestVisible private static final LoggingLevel DEFAULT_LOG_LEVEL = LoggingLevel.WARN;
+    @TestVisible private static final LogTarget DEFAULT_LOG_TARGET = LogTarget.ALL;
     public static final String DEFAULT_CONFIGURATION_NAME = 'Default';
 
     /**
@@ -311,6 +311,7 @@ public inherited sharing class Logger {
      * 
      * @param targetLogLevel The target log level to be mapped
      */
+    @TestVisible
     private LoggingLevel mapLogLevel(String targetLogLevel) {
         if (String.isBlank(targetLogLevel)) {
             throw new IllegalArgumentException('Log Level for logger configuration must be provided');
@@ -354,6 +355,7 @@ public inherited sharing class Logger {
      * 
      * @param targetLogTarget The String value of the log target
      */
+    @TestVisible
     private LogTarget mapLogTarget(String targetLogTarget) {
         if (String.isBlank(targetLogTarget)) {
             throw new IllegalArgumentException('Log Target for logger configuration must be provided');
@@ -375,6 +377,15 @@ public inherited sharing class Logger {
             }
         }
         return newLogTarget;
+    }
+
+    /**
+     * Helper method to retrieve the default logger configuration record.
+     * 
+     * @return The default logger configuration record
+     */
+    public static Logger_Configuration__mdt getDefaultConfiguration() {
+        return Logger_Configuration__mdt.getInstance(Logger.DEFAULT_CONFIGURATION_NAME);
     }
 
     /**
