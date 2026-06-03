@@ -55,7 +55,7 @@ public inherited sharing class Logger {
     /**
      * Constructor with configuration instance argument
      * 
-     * @param config An instance of LoggerConfiguration
+     * @param config The logger configuration record
      */
     public Logger(Logger_Configuration__mdt config) {
         if (config == null) {
