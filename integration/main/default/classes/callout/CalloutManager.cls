@@ -63,7 +63,6 @@ public inherited sharing class CalloutManager {
         this.queryParams = new Map<String, String>();
         this.compressed = false;
 
-        // Set properties from config
         if (String.isNotBlank(config.Endpoint__c)) {
             this.endpoint = config.Endpoint__c;
         }

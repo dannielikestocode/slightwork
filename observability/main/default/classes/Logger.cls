@@ -11,7 +11,7 @@
  * LoggingLevel.FINE: 4
  * LoggingLevel.FINER: 3
  * LoggingLevel.FINEST: 2
- * LoggingLevel.NONE: 0
+ * LoggingLevel.NONE: 0 => (FINEST to NONE skips 1 and goes straight to 0)
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
@@ -23,13 +23,16 @@ public inherited sharing class Logger {
     /**
      * Constants
      */
+    private static final LoggingLevel DEFAULT_LOG_LEVEL = LoggingLevel.WARN;
+    private static final LogTarget DEFAULT_LOG_TARGET = LogTarget.ALL;
     public static final String DEFAULT_CONFIGURATION_NAME = 'Default';
 
     /**
      * Properties
      */
-    private final LoggerConfiguration config {get;set;}
-    private final List<LogRecord> logQueue {get;set;}
+    private final List<LogRecord> logQueue {get; set;}
+    public final LoggingLevel currentLogLevel {get; private set;}
+    public final LogTarget currentLogTarget {get; private set;}
 
     /**
      * Enums
@@ -44,8 +47,9 @@ public inherited sharing class Logger {
      * Default, no-arg constructor
      */
     public Logger() {
-        this.config = new LoggerConfiguration();
         this.logQueue = new List<LogRecord>();
+        this.currentLogLevel = DEFAULT_LOG_LEVEL;
+        this.currentLogTarget = DEFAULT_LOG_TARGET;
     }
 
     /**
@@ -53,13 +57,15 @@ public inherited sharing class Logger {
      * 
      * @param config An instance of LoggerConfiguration
      */
-    public Logger(LoggerConfiguration config) {
+    public Logger(Logger_Configuration__mdt config) {
         if (config == null) {
             throw new IllegalArgumentException('Logger Configuration must be provided');
-
         }
-        this.config = config;
+        
+        // Set properties
         this.logQueue = new List<LogRecord>();
+        this.currentLogLevel = mapLogLevel(config.Default_Log_Level__c);
+        this.currentLogTarget = mapLogTarget(config.Default_Log_Target__c);
     }
 
     /**
@@ -74,7 +80,7 @@ public inherited sharing class Logger {
             return false;
         }
         else {
-            return targetLogLevel.ordinal() >= this.config.currentLogLevel.ordinal();
+            return targetLogLevel.ordinal() >= this.currentLogLevel.ordinal();
         }
     }
 
@@ -125,12 +131,12 @@ public inherited sharing class Logger {
         String message = objectToString(obj);
         
         // Handle System.debug()
-        if (this.config.currentLogTarget == LogTarget.SYSTEM_DEBUG || this.config.currentLogTarget == LogTarget.ALL) {
+        if (this.currentLogTarget == LogTarget.SYSTEM_DEBUG || this.currentLogTarget == LogTarget.ALL) {
             System.debug(targetLogLevel, message);
         }
 
         // Handle Platform Event queue
-        if (this.config.currentLogTarget == LogTarget.PLATFORM_EVENT || this.config.currentLogTarget == LogTarget.ALL) {
+        if (this.currentLogTarget == LogTarget.PLATFORM_EVENT || this.currentLogTarget == LogTarget.ALL) {
             this.logQueue.add(new LogRecord(targetLoglevel.name().toUpperCase(), message));
         }
     }
@@ -225,7 +231,7 @@ public inherited sharing class Logger {
      * @param obj The object to log
      */
     public void log(Object obj) {
-        addLogRecord(this.config.currentLogLevel, obj);
+        addLogRecord(this.currentLogLevel, obj);
     }
 
     /**
@@ -301,119 +307,74 @@ public inherited sharing class Logger {
     }
 
     /**
-     * Inner class to represent logger configuration
+     * Maps the log level to the corresponding enum value.
+     * 
+     * @param targetLogLevel The target log level to be mapped
      */
-    public class LoggerConfiguration {
-        /**
-         * Constants
-         */
-        public final LoggingLevel DEFAULT_LOG_LEVEL = LoggingLevel.WARN;
-        public final LogTarget DEFAULT_LOG_TARGET = LogTarget.ALL;
-
-        /**
-         * Properties
-         */
-        public final LoggingLevel currentLogLevel {get;private set;}
-        public final LogTarget currentLogTarget {get;private set;}
-
-        /**
-         * Default, no-arg constructor
-         */
-        public LoggerConfiguration() {
-            this.currentLogLevel = DEFAULT_LOG_LEVEL;
-            this.currentLogTarget = DEFAULT_LOG_TARGET;
+    private LoggingLevel mapLogLevel(String targetLogLevel) {
+        if (String.isBlank(targetLogLevel)) {
+            throw new IllegalArgumentException('Log Level for logger configuration must be provided');
         }
 
-        /**
-         * Constructor with args
-         * 
-         * @param configName The name of the logger configuration record
-         */
-        public LoggerConfiguration(String configName) {
-            if (String.isBlank(configName)) {
-                throw new IllegalArgumentException('Config Name for logger configuration must be provided');
+        LoggingLevel newLoggingLevel; 
+        switch on targetLogLevel.toUpperCase() {
+            when 'NONE' {
+                newLoggingLevel = LoggingLevel.NONE;
             }
-
-            Logger_Configuration__mdt configRecord = Logger_Configuration__mdt.getInstance(configName);
-            if (configRecord == null) {
-                throw new QueryException('Logger Configuration not found for name: ' + configName);
+            when 'ERROR' {
+                newLoggingLevel = LoggingLevel.ERROR;
             }
+            when 'WARN' {
+                newLoggingLevel = LoggingLevel.WARN;
+            }
+            when 'INFO' {
+                newLoggingLevel = LoggingLevel.INFO;
+            }
+            when 'DEBUG' {
+                newLoggingLevel = LoggingLevel.DEBUG;
+            }
+            when 'FINE' {
+                newLoggingLevel = LoggingLevel.FINE;
+            }
+            when 'FINER' {
+                newLoggingLevel = LoggingLevel.FINER;
+            }
+            when 'FINEST' {
+                newLoggingLevel = LoggingLevel.FINEST;
+            }
+            when else {
+                newLoggingLevel = DEFAULT_LOG_LEVEL;
+            }
+        }
+        return newLoggingLevel;
+    }
 
-            // Set configuration properties
-            this.currentLogLevel = mapLogLevel(configRecord.Default_Log_Level__c);
-            this.currentLogTarget = mapLogTarget(configRecord.Default_Log_Target__c);
+    /**
+     * Maps the log target to the corresponding enum value.
+     * 
+     * @param targetLogTarget The String value of the log target
+     */
+    private LogTarget mapLogTarget(String targetLogTarget) {
+        if (String.isBlank(targetLogTarget)) {
+            throw new IllegalArgumentException('Log Target for logger configuration must be provided');
         }
 
-        /**
-         * Maps the log level to the corresponding enum value.
-         * 
-         * @param targetLogLevel The target log level to be mapped
-         */
-        public LoggingLevel mapLogLevel(String targetLogLevel) {
-            if (String.isBlank(targetLogLevel)) {
-                throw new IllegalArgumentException('Log Level for logger configuration must be provided');
+        LogTarget newLogTarget; 
+        switch on targetLogTarget.toUpperCase() {
+            when 'ALL' {
+                newLogTarget = LogTarget.ALL;
             }
-
-            LoggingLevel newLoggingLevel; 
-            switch on targetLogLevel.toUpperCase() {
-                when 'NONE' {
-                    newLoggingLevel = LoggingLevel.NONE;
-                }
-                when 'ERROR' {
-                    newLoggingLevel = LoggingLevel.ERROR;
-                }
-                when 'WARN' {
-                    newLoggingLevel = LoggingLevel.WARN;
-                }
-                when 'INFO' {
-                    newLoggingLevel = LoggingLevel.INFO;
-                }
-                when 'DEBUG' {
-                    newLoggingLevel = LoggingLevel.DEBUG;
-                }
-                when 'FINE' {
-                    newLoggingLevel = LoggingLevel.FINE;
-                }
-                when 'FINER' {
-                    newLoggingLevel = LoggingLevel.FINER;
-                }
-                when 'FINEST' {
-                    newLoggingLevel = LoggingLevel.FINEST;
-                }
-                when else {
-                    newLoggingLevel = DEFAULT_LOG_LEVEL;
-                }
+            when 'PLATFORM_EVENT' {
+                newLogTarget = LogTarget.PLATFORM_EVENT;
             }
-            return newLoggingLevel;
+            when 'SYSTEM_DEBUG' {
+                newLogTarget = LogTarget.SYSTEM_DEBUG;
+            }
+            when else {
+                newLogTarget = DEFAULT_LOG_TARGET;
+            }
         }
-
-        /**
-         * Maps the log target to the corresponding enum value.
-         * 
-         * @param targetLogTarget The String value of the log target
-         */
-        public LogTarget mapLogTarget(String targetLogTarget) {
-            if (String.isBlank(targetLogTarget)) {
-                throw new IllegalArgumentException('Log Target for logger configuration must be provided');
-            }
-
-            LogTarget newLogTarget; 
-            switch on targetLogTarget.toUpperCase() {
-                when 'ALL' {
-                    newLogTarget = LogTarget.ALL;
-                }
-                when 'PLATFORM_EVENT' {
-                    newLogTarget = LogTarget.PLATFORM_EVENT;
-                }
-                when 'SYSTEM_DEBUG' {
-                    newLogTarget = LogTarget.SYSTEM_DEBUG;
-                }
-                when else {
-                    newLogTarget = DEFAULT_LOG_TARGET;
-                }
-            }
-            return newLogTarget;
-        }
+        return newLogTarget;
     }
 
     /**
