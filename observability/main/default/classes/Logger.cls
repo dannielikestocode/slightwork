@@ -80,7 +80,7 @@ public inherited sharing class Logger {
             return false;
         }
         else {
-            return targetLogLevel.ordinal() >= this.currentLogLevel.ordinal();
+            return this.currentLogLevel.ordinal() <= targetLogLevel.ordinal();
         }
     }
 
@@ -130,13 +130,14 @@ public inherited sharing class Logger {
     private void addLogRecord(LoggingLevel targetLoglevel, Object obj) {
         String message = objectToString(obj);
         
-        // Handle System.debug()
-        if (this.currentLogTarget == LogTarget.SYSTEM_DEBUG || this.currentLogTarget == LogTarget.ALL) {
+        // Handle System.debug(). Logs added via the System class are always published immediately
+        // without explicitly calling flush().
+        if (this.currentLogTarget == LogTarget.ALL || this.currentLogTarget == LogTarget.SYSTEM_DEBUG) {
             System.debug(targetLogLevel, message);
         }
 
         // Handle Platform Event queue
-        if (this.currentLogTarget == LogTarget.PLATFORM_EVENT || this.currentLogTarget == LogTarget.ALL) {
+        if (this.currentLogTarget == LogTarget.ALL || this.currentLogTarget == LogTarget.PLATFORM_EVENT) {
             this.logQueue.add(new LogRecord(targetLoglevel.name().toUpperCase(), message));
         }
     }
