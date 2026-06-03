@@ -21,7 +21,6 @@ public inherited sharing class CalloutManager {
     /**
      * Properties
      */
-    private Boolean captureRequestData {get;set;}
     private Boolean encodeQueryParams {get;set;}
     private final Map<String, String> headers {get;set;}
     private final Map<String, String> queryParams {get;set;}
@@ -39,7 +38,6 @@ public inherited sharing class CalloutManager {
      * Default, no-arg constructor
      */
     public CalloutManager() {
-        this.captureRequestData = false;
         this.encodeQueryParams = false;
         this.headers = new Map<String, String>();
         this.queryParams = new Map<String, String>();
@@ -58,32 +56,31 @@ public inherited sharing class CalloutManager {
         }
 
         // Set properties
-        this.captureRequestData = false;
         this.encodeQueryParams = false;
         this.headers = new Map<String, String>();
         this.queryParams = new Map<String, String>();
+        this.compressed = false;
 
         if (String.isNotBlank(config.Endpoint__c)) {
             this.endpoint = config.Endpoint__c;
         }
+
         if (String.isNotBlank(config.Method__c)) {
             this.method = config.Method__c.toUpperCase();
         }
+
         if (config.Timeout__c != null) {
             this.timeout = Integer.valueOf(config.Timeout__c);
         }
+
         if (String.isNotBlank(config.Named_Credential__c)) {
             this.namedCredential = config.Named_Credential__c;
         }
-        if (String.isNotBlank(config.Content_Type__c)) {
-            withHeader('Content-Type', config.Content_Type__c);
-        }
-        if (String.isNotBlank(config.Accept__c)) {
-            withHeader('Accept', config.Accept__c);
-        }
+
         if (config.Compressed__c != null) {
             this.compressed = config.Compressed__c;
         }
+
         if (String.isNotBlank(config.Client_Certificate__c)) {
             this.clientCertificateName = config.Client_Certificate__c;
         }
@@ -326,22 +323,6 @@ public inherited sharing class CalloutManager {
         this.namedCredential = namedCredential;
         return this;
     }
- 
-    /**
-     * Enables capturing of request data in the CalloutResult.
-     * When enabled, the result will include request details for debugging/logging.
-     * 
-     * @param captureRequestData True to enable request capture
-     * @return This builder instance for method chaining
-     * @throws IllegalArgumentException when capture request data is null
-     */
-    public CalloutManager withCaptureRequestData(Boolean captureRequestData) {
-        if (captureRequestData = null) {
-            throw new IllegalArgumentException('Capture Request Data must be provided');
-        }
-        this.captureRequestData = captureRequestData;
-        return this;
-    }
 
     /**
      * Enables encoding of query params within the endpoint.
@@ -365,14 +346,14 @@ public inherited sharing class CalloutManager {
      * @return A configured HttpRequest instance
      * @throws IllegalStateException if required fields are missing
      */
-    public HttpRequest build() {
+    public HttpRequest buildRequest() {
         validateRequest();
         
         // Build the request from manager properties
         HttpRequest request = new HttpRequest();
         request.setEndpoint(buildFinalEndpoint());
         request.setMethod(this.method);
-        request.setTimeout(this.timeout);
+        request.setTimeout(this.timeout == null ? DEFAULT_TIMEOUT : this.timeout);
 
         // Set headers
         for (String key : this.headers.keySet()) {
@@ -408,7 +389,7 @@ public inherited sharing class CalloutManager {
      * @throws CalloutException if the HTTP callout fails
      */
     public CalloutResult send() {
-        HttpRequest request = build();
+        HttpRequest request = buildRequest();
         Http http = new Http();
         HttpResponse response;
         
@@ -417,7 +398,7 @@ public inherited sharing class CalloutManager {
         } catch (Exception e) {
             throw new CalloutException('Callout failed: ' + e.getMessage(), e);
         }
-        return new CalloutResult(request, response, this.captureRequestData);
+        return new CalloutResult(request, response);
     }
   
     /**
@@ -481,7 +462,7 @@ public inherited sharing class CalloutManager {
      * callout.
      */
     public class CalloutResult {
-        public CalloutResult(HttpRequest request, HttpResponse response, Boolean captureRequestData) {
+        public CalloutResult(HttpRequest request, HttpResponse response) {
 
         }
     }
