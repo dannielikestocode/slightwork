@@ -22,6 +22,7 @@ public inherited sharing class CalloutManager {
      * Properties
      */
     private Boolean encodeQueryParams {get;set;}
+    private String calloutName {get;set;}
     private final Map<String, String> headers {get;set;}
     private final Map<String, String> queryParams {get;set;}
     private String endpoint {get;set;}
@@ -57,10 +58,12 @@ public inherited sharing class CalloutManager {
 
         // Set properties
         this.encodeQueryParams = false;
+        this.calloutName = config.DeveloperName;
         this.headers = new Map<String, String>();
         this.queryParams = new Map<String, String>();
         this.compressed = false;
 
+        // Set properties from config
         if (String.isNotBlank(config.Endpoint__c)) {
             this.endpoint = config.Endpoint__c;
         }
@@ -84,6 +87,25 @@ public inherited sharing class CalloutManager {
         if (String.isNotBlank(config.Client_Certificate__c)) {
             this.clientCertificateName = config.Client_Certificate__c;
         }
+
+        if (config.Encode_Query_Params__c != null) {
+            this.encodeQueryParams = config.Encode_Query_Params__c;
+        }
+    }
+    
+    /**
+     * Sets the name of the callout for logging purposes.
+     * 
+     * @param calloutName The name of the callout
+     * @return This builder instance for method chaining
+     * @throws IllegalArgumentException if callout name is blank
+     */
+    public CalloutManager withCalloutName(String calloutName) {
+        if (String.isBlank(calloutName)) {
+            throw new IllegalArgumentException('Callout Name cannot be blank');
+        }
+        this.calloutName = calloutName;
+        return this;
     }
     
     /**
@@ -389,16 +411,12 @@ public inherited sharing class CalloutManager {
      * @throws CalloutException if the HTTP callout fails
      */
     public CalloutResult send() {
+        // Build and send the request, then returnt the result
         HttpRequest request = buildRequest();
         Http http = new Http();
         HttpResponse response;
-        
-        try {
-            response = http.send(request);
-        } catch (Exception e) {
-            throw new CalloutException('Callout failed: ' + e.getMessage(), e);
-        }
-        return new CalloutResult(request, response);
+        response = http.send(request);
+        return new CalloutResult(this, request, response);
     }
   
     /**
@@ -462,8 +480,29 @@ public inherited sharing class CalloutManager {
      * callout.
      */
     public class CalloutResult {
-        public CalloutResult(HttpRequest request, HttpResponse response) {
+        /**
+         * Properties
+         */
+        public HttpRequest request {get; private set;}
+        public HttpResponse response {get; private set;}
+        public Request__c requestRecord {get; private set;}
+        
+        /**
+         * Constructor with args for request and response
+         */
+        public CalloutResult(CalloutManager callout, HttpRequest request, HttpResponse response) {
+            this.request = request;
+            this.response = response;
+            this.requestRecord = buildRequestRecord(callout, request, response);
+        }
 
+        private Request__c buildRequestRecord(CalloutManager callout, HttpRequest request, HttpResponse response) {
+            Request__c requestRecord = new Request__c();
+
+            if (String.isNotBlank(callout.calloutName)) {
+                // requestRecord.Callout_Name__c = callout.calloutName;
+            }
+            return requestRecord;
         }
     }
 }
