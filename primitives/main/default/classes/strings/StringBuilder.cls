@@ -8,13 +8,13 @@
  */
 public inherited sharing class StringBuilder {
     /**
-     * String Builder Parts
+     * Properties
      */
     private final List<String> stringParts {get;set;}
     private final Set<String> existingValues {get;set;}
 
     /**
-     * Builder Options
+     * Builder Option Properties
      */
     private NullValueAction actionOnNullValue {get;set;}
     private Boolean trimValue {get;set;}

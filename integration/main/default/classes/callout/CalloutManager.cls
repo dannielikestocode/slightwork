@@ -486,6 +486,13 @@ public inherited sharing class CalloutManager {
         public final HttpRequest request {get; private set;}
         public final HttpResponse response {get; private set;}
         public final Request__c requestRecord {get; private set;}
+
+        /**
+         * Derived Properties
+         */
+        public Integer statusCode {get {return this.response.getStatusCode();}}
+        public String status {get {return this.response.getStatus();}}
+        public String responseBody {get {return this.response.getBody();}}
         
         /**
          * Constructor with args
