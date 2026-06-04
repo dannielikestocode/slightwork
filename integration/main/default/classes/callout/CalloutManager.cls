@@ -22,19 +22,19 @@ public inherited sharing class CalloutManager {
     /**
      * Properties
      */
-    private Boolean encodeQueryParams {get;set;}
-    private String calloutName {get;set;}
-    private final Map<String, String> headers {get;set;}
-    private final Map<String, String> queryParams {get;set;}
-    private String endpoint {get;set;}
-    private String method {get;set;}
-    private String body {get;set;}
-    private Blob blobBody {get;set;}
-    private Dom.Document documentBody {get;set;}
-    private Integer timeout {get;set;}
-    private Boolean compressed {get;set;}
-    private String clientCertificateName {get;set;}
-    private String namedCredential {get;set;}
+    @TestVisible private Boolean encodeQueryParams {get;set;}
+    @TestVisible private String calloutName {get;set;}
+    @TestVisible private final Map<String, String> headers {get;set;}
+    @TestVisible private final Map<String, String> queryParams {get;set;}
+    @TestVisible private String endpoint {get;set;}
+    @TestVisible private String method {get;set;}
+    @TestVisible private String body {get;set;}
+    @TestVisible private Blob blobBody {get;set;}
+    @TestVisible private Dom.Document documentBody {get;set;}
+    @TestVisible private Integer timeout {get;set;}
+    @TestVisible private Boolean compressed {get;set;}
+    @TestVisible private String clientCertificateName {get;set;}
+    @TestVisible private String namedCredential {get;set;}
   
     /**
      * Default, no-arg constructor
@@ -354,7 +354,7 @@ public inherited sharing class CalloutManager {
      * @throws IllegalArgumentException when encode query params is null
      */
     public CalloutManager withEncodeQueryParams(Boolean encodeQueryParams) {
-        if (encodeQueryParams = null) {
+        if (encodeQueryParams == null) {
             throw new IllegalArgumentException('Encode Query Params must be provided');
         }
         this.encodeQueryParams = encodeQueryParams;

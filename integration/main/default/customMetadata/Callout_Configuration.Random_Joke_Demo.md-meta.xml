@@ -11,6 +11,10 @@
         <value xsi:type="xsd:boolean">false</value>
     </values>
     <values>
+        <field>Description__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>Encode_Query_Params__c</field>
         <value xsi:type="xsd:boolean">false</value>
     </values>
