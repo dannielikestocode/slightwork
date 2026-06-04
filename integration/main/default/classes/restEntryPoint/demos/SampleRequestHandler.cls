@@ -1,5 +1,5 @@
 /**
- * @description Sample implementation of the Requestable interface demonstrating
+ * Sample implementation of the Requestable interface demonstrating
  * how to handle REST requests through the RestEntryPoint framework.
  * 
  * This handler can be configured in Endpoint_Definition__mdt with patterns like:
@@ -10,7 +10,7 @@
 public class SampleRequestHandler implements Requestable {
     
     /**
-     * @description Handle GET requests
+     * Handle GET requests
      * Example: GET /api/sample?name=test&limit=10
      * Example: GET /api/sample/{id}
      */
@@ -48,7 +48,7 @@ public class SampleRequestHandler implements Requestable {
     }
     
     /**
-     * @description Handle POST requests
+     * Handle POST requests
      * Example: POST /api/sample with JSON body
      */
     public void handlePost(RequestContext context) {
@@ -82,7 +82,7 @@ public class SampleRequestHandler implements Requestable {
     }
     
     /**
-     * @description Handle PUT requests
+     * Handle PUT requests
      * Example: PUT /api/sample/{id} with JSON body
      */
     public void handlePut(RequestContext context) {
@@ -123,7 +123,7 @@ public class SampleRequestHandler implements Requestable {
     }
     
     /**
-     * @description Handle PATCH requests
+     * Handle PATCH requests
      * Example: PATCH /api/sample/{id} with partial JSON body
      */
     public void handlePatch(RequestContext context) {
@@ -164,7 +164,7 @@ public class SampleRequestHandler implements Requestable {
     }
     
     /**
-     * @description Handle DELETE requests
+     * Handle DELETE requests
      * Example: DELETE /api/sample/{id}
      */
     public void handleDelete(RequestContext context) {
@@ -193,7 +193,7 @@ public class SampleRequestHandler implements Requestable {
     }
     
     /**
-     * @description Helper method to send error responses
+     * Helper method to send error responses
      */
     private void sendError(RestResponse res, Integer statusCode, String message) {
         Map<String, Object> errorResponse = new Map<String, Object>{

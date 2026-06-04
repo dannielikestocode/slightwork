@@ -1,18 +1,18 @@
 /**
- * @description Matcher class that dynamically routes REST requests to appropriate handlers
+ * Matcher class that dynamically routes REST requests to appropriate handlers
  * based on Endpoint Definition metadata. Supports static and dynamic routes with path parameters.
  */
 public class EndpointDefinitionMatcher {
     private List<Endpoint_Definition__mdt> endpointDefinitions;
     
     /**
-     * @description Constructor that loads all active endpoint definitions
+     * Constructor that loads all active endpoint definitions
      */
     public EndpointDefinitionMatcher() {
         this.endpointDefinitions = [
             SELECT Id, DeveloperName, Endpoint_Pattern__c, Handler_Class__c,
-                   Allowed_Methods__c, Success_Response_Code__c, 
-                   Requires_Authentication__c, IsActive__c
+                  Success_Response_Code__c, 
+                  IsActive__c
             FROM Endpoint_Definition__mdt
             WHERE IsActive__c = true
             ORDER BY Priority__c ASC NULLS LAST
@@ -20,7 +20,7 @@ public class EndpointDefinitionMatcher {
     }
     
     /**
-     * @description Match an incoming request to an endpoint definition
+     * Match an incoming request to an endpoint definition
      * @param requestUri The request URI path
      * @param httpMethod The HTTP method (GET, POST, etc.)
      * @return MatchResult containing the matched definition and path parameters
@@ -54,7 +54,7 @@ public class EndpointDefinitionMatcher {
     }
     
     /**
-     * @description Normalize the URI by removing query strings and extra slashes
+     * Normalize the URI by removing query strings and extra slashes
      * @param uri The raw URI
      * @return Normalized URI
      */
@@ -78,7 +78,7 @@ public class EndpointDefinitionMatcher {
     }
     
     /**
-     * @description Check if the HTTP method is allowed for this endpoint
+     * Check if the HTTP method is allowed for this endpoint
      * @param definition The endpoint definition
      * @param httpMethod The HTTP method to check
      * @return True if the method is allowed
@@ -99,7 +99,7 @@ public class EndpointDefinitionMatcher {
     }
     
     /**
-     * @description Match a URI against a pattern and extract path parameters
+     * Match a URI against a pattern and extract path parameters
      * Pattern syntax:
      *   - Static segments: /api/users
      *   - Dynamic segments: /api/users/{id}
@@ -149,7 +149,7 @@ public class EndpointDefinitionMatcher {
     }
     
     /**
-     * @description Inner class representing the result of a match operation
+     * Inner class representing the result of a match operation
      */
     public class MatchResult {
         public Endpoint_Definition__mdt definition { get; private set; }

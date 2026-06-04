@@ -1,15 +1,25 @@
 /**
- * @description Main REST entry point that uses Endpoint Definition metadata to dynamically
- * route requests to appropriate handler classes. Supports dynamic routing with path parameters,
- * query parameter parsing, and header extraction.
+ * Main REST entry point that uses Endpoint Definition metadata to dynamically
+ * route requests to appropriate handler classes. Supports dynamic routing 
+ * with path parameters, query parameter parsing, and header extraction.
  * 
- * @RestResource urlMapping='/api/*'
+ * @author Dannie @ Wynforce
+ * @since v66.0
+ * @see https://slightwork.dev/modules/integration/rest-entry-point.html
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_rest_intro.htm
  */
-@RestResource(urlMapping='/api/*')
-global without sharing class RestEntryPoint {
-    
+@RestResource(urlMapping='/*')
+global with sharing class RestEntryPoint {
     /**
-     * @description Handle HTTP GET requests
+     * Handle HTTP POST requests
+     */
+    @HttpPost
+    global static void doPost() {
+        processRequest('POST');
+    }
+
+    /**
+     * Handle HTTP GET requests
      */
     @HttpGet
     global static void doGet() {
@@ -17,15 +27,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Handle HTTP POST requests
-     */
-    @HttpPost
-    global static void doPost() {
-        processRequest('POST');
-    }
-    
-    /**
-     * @description Handle HTTP PUT requests
+     * Handle HTTP PUT requests
      */
     @HttpPut
     global static void doPut() {
@@ -33,7 +35,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Handle HTTP PATCH requests
+     * Handle HTTP PATCH requests
      */
     @HttpPatch
     global static void doPatch() {
@@ -41,7 +43,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Handle HTTP DELETE requests
+     * Handle HTTP DELETE requests
      */
     @HttpDelete
     global static void doDelete() {
@@ -49,7 +51,8 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Main request processing logic that routes to appropriate handlers
+     * Main request processing logic that routes to appropriate handlers
+     * 
      * @param httpMethod The HTTP method being invoked
      */
     private static void processRequest(String httpMethod) {
@@ -106,7 +109,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Parse HTTP headers into a map
+     * Parse HTTP headers into a map
      * @param headers Map of header names to lists of values
      * @return Map of header names to single string values (first value if multiple)
      */
@@ -128,7 +131,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Parse query parameters into a map
+     * Parse query parameters into a map
      * @param params Map of parameter names to lists of values
      * @return Map of parameter names to single string values (first value if multiple)
      */
@@ -150,7 +153,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Instantiate a handler class by name
+     * Instantiate a handler class by name
      * @param className The fully qualified class name
      * @return Instance of Requestable or null if instantiation fails
      */
@@ -175,7 +178,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Invoke the appropriate handler method based on HTTP verb
+     * Invoke the appropriate handler method based on HTTP verb
      * @param handler The handler instance
      * @param httpMethod The HTTP method
      * @param context The request context
@@ -204,7 +207,7 @@ global without sharing class RestEntryPoint {
     }
     
     /**
-     * @description Send an error response
+     * Send an error response
      * @param res The RestResponse to populate
      * @param statusCode HTTP status code
      * @param message Error message

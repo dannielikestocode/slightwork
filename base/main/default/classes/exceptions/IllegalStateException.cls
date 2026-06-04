@@ -7,4 +7,4 @@
  * @since v66.0
  */
 @NamespaceAccessible
-public inherited sharing class IllegalStateException extends Exception { }
+public without sharing class IllegalStateException extends Exception { }

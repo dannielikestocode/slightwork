@@ -1,5 +1,5 @@
 /**
- * @description Context object that encapsulates all information about an HTTP request.
+ * Context object that encapsulates all information about an HTTP request.
  * This class is passed to Requestable implementations to provide access to headers,
  * parameters, body, and the underlying RestContext.
  */
@@ -10,7 +10,7 @@ public class RequestContext {
     private Map<String, String> pathParams;
     
     /**
-     * @description Constructor for RequestContext
+     * Constructor for RequestContext
      * @param headers Map of HTTP headers
      * @param queryParams Map of query string parameters
      * @param requestBody The raw request body
@@ -29,7 +29,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get all HTTP headers
+     * Get all HTTP headers
      * @return Map of header names to values
      */
     public Map<String, String> getHeaders() {
@@ -37,7 +37,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get a specific header value
+     * Get a specific header value
      * @param headerName The name of the header
      * @return The header value or null if not found
      */
@@ -46,7 +46,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get all query parameters
+     * Get all query parameters
      * @return Map of parameter names to values
      */
     public Map<String, String> getQueryParams() {
@@ -54,7 +54,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get a specific query parameter value
+     * Get a specific query parameter value
      * @param paramName The name of the parameter
      * @return The parameter value or null if not found
      */
@@ -63,7 +63,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get the raw request body
+     * Get the raw request body
      * @return The request body as a string
      */
     public String getRequestBody() {
@@ -71,7 +71,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get all path parameters (populated by the matcher)
+     * Get all path parameters (populated by the matcher)
      * @return Map of path parameter names to values
      */
     public Map<String, String> getPathParams() {
@@ -79,7 +79,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Set path parameters (used by the matcher)
+     * Set path parameters (used by the matcher)
      * @param pathParams Map of path parameter names to values
      */
     public void setPathParams(Map<String, String> pathParams) {
@@ -87,7 +87,7 @@ public class RequestContext {
     }
     
     /**
-     * @description Get a specific path parameter value
+     * Get a specific path parameter value
      * @param paramName The name of the path parameter
      * @return The parameter value or null if not found
      */
