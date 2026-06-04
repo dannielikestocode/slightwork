@@ -17,6 +17,7 @@ public inherited sharing class CalloutManager {
     public static final Integer DEFAULT_TIMEOUT = 10000; // 10 seconds millis (The Salesforce default: https://help.salesforce.com/s/articleView?id=000387845&type=1)
     public static final Set<String> SUPPORTED_HTTP_METHODS = new Set<String>{'DELETE','GET','HEAD','PATCH','POST','PUT','TRACE'};
     public static final String ENCODE_UTF8 = 'UTF-8';
+    public static final Integer MAX_BODY_FIELD_LENGTH = 131072; // Max length of a long-text field
 
     /**
      * Properties
@@ -482,12 +483,12 @@ public inherited sharing class CalloutManager {
         /**
          * Properties
          */
-        public HttpRequest request {get; private set;}
-        public HttpResponse response {get; private set;}
-        public Request__c requestRecord {get; private set;}
+        public final HttpRequest request {get; private set;}
+        public final HttpResponse response {get; private set;}
+        public final Request__c requestRecord {get; private set;}
         
         /**
-         * Constructor with args for request and response
+         * Constructor with args
          */
         public CalloutResult(CalloutManager callout, HttpRequest request, HttpResponse response) {
             this.request = request;
@@ -498,10 +499,44 @@ public inherited sharing class CalloutManager {
         private Request__c buildRequestRecord(CalloutManager callout, HttpRequest request, HttpResponse response) {
             Request__c requestRecord = new Request__c();
 
-            if (String.isNotBlank(callout.calloutName)) {
-                // requestRecord.Callout_Name__c = callout.calloutName;
+            // Set configuration details
+            requestRecord.Callout_Name__c = callout.calloutName;
+            requestRecord.Named_Credential__c = callout.namedCredential;
+            requestRecord.Client_Certificate__c = callout.clientCertificateName;
+            requestRecord.Timeout__c = callout.timeout;
+            requestRecord.Compressed__c = callout.compressed;
+            requestRecord.Encode_Query_Params__c = callout.encodeQueryParams;
+
+            // Set request details
+            requestRecord.Method__c = callout.method;
+            requestRecord.Endpoint__c = request.getEndpoint();
+            requestRecord.Query_Params__c = JSON.serialize(callout.queryParams);
+            requestRecord.Request_Headers__c = JSON.serialize(callout.headers);
+            requestRecord.Request_Body__c = this.getTruncatedBody(request.getBody());
+
+            // Set response details
+            requestRecord.Status_Code__c = response.getStatusCode();
+            requestRecord.Status_Message__c = response.getStatus();
+
+            Map<String, String> responseHeaders = new Map<String, String>();
+            for (String responseHeaderKey: response.getHeaderKeys()) {
+                responseHeaders.put(responseHeaderKey, response.getHeader(responseHeaderKey));
             }
+
+            requestRecord.Response_Headers__c = JSON.serialize(responseHeaders);
+            requestRecord.Response_Body__c = this.getTruncatedBody(response.getBody());
             return requestRecord;
+        }
+
+        private String getTruncatedBody(String requestOrResponseBody) {
+            if (String.isBlank(requestOrResponseBody)) {
+                return '';
+            }
+
+            if (requestOrResponseBody.length() > MAX_BODY_FIELD_LENGTH) {
+                return requestOrResponseBody.substring(0, MAX_BODY_FIELD_LENGTH - 1);
+            }
+            return requestOrResponseBody;
         }
     }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Query_Params__c</fullName>
+    <description>The JSON-formatted collection of query params sent with a request as part of the endpoint</description>
+    <inlineHelpText>The JSON-formatted collection of query params sent with a request as part of the endpoint</inlineHelpText>
+    <label>Query Params</label>
+    <length>1000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

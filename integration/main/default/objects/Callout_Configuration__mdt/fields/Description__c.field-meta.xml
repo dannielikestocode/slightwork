@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Description__c</fullName>
+    <description>Captures description or notes about the callout.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Captures description or notes about the callout.</inlineHelpText>
+    <label>Description</label>
+    <required>false</required>
+    <type>TextArea</type>
+</CustomField>
