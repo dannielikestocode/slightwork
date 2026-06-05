@@ -6,6 +6,15 @@
  */
 public with sharing class HttpContext {
     /**
+     * Constants
+     */
+    public static final String POST_METHOD = 'POST';
+    public static final String GET_METHOD = 'GET';
+    public static final String PUT_METHOD = 'PUT';
+    public static final String PATCH_METHOD = 'PATCH';
+    public static final String DELETE_METHOD = 'DELETE';
+
+    /**
      * Defines Status codes for Http Responses.
      * 
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status For full status code reference

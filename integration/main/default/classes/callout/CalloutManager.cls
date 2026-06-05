@@ -16,7 +16,7 @@ public inherited sharing class CalloutManager {
     public static final Integer MIN_TIMEOUT = 1; // In mills
     public static final Integer DEFAULT_TIMEOUT = 10000; // 10 seconds millis (The Salesforce default: https://help.salesforce.com/s/articleView?id=000387845&type=1)
     public static final Set<String> SUPPORTED_HTTP_METHODS = new Set<String>{'DELETE','GET','HEAD','PATCH','POST','PUT','TRACE'};
-    public static final String ENCODE_UTF8 = 'UTF-8';
+    public static final String CHARSET_UTF8 = 'UTF-8';
     public static final Integer MAX_BODY_FIELD_LENGTH = 131072; // Max length of a long-text field
 
     /**
@@ -458,9 +458,9 @@ public inherited sharing class CalloutManager {
             Integer numberOfParams = this.queryParams.size();
             Integer paramCounter = 0;
             for (String key: this.queryParams.keySet()) {
-                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(key, ENCODE_UTF8) : key);
+                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(key, CHARSET_UTF8) : key);
                 endpointParts.add('=');
-                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(this.queryParams.get(key), ENCODE_UTF8) : this.queryParams.get(key) );
+                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(this.queryParams.get(key), CHARSET_UTF8) : this.queryParams.get(key) );
 
                 // If there are multiple query params, don't include the
                 // ampersand/concat operator after the final param

@@ -9,27 +9,27 @@
  */
 public without sharing class RequestContext {
     private Map<String, String> headers;
-    private Map<String, String> queryParams;
+    private Map<String, String> urlParams;
     private String requestBody;
-    private Map<String, String> pathParams;
+    private Map<String, String> pathVariables;
     
     /**
      * Constructor for RequestContext
      * @param headers Map of HTTP headers
-     * @param queryParams Map of query string parameters
+     * @param urlParams Map of query string parameters
      * @param requestBody The raw request body
      * @param restContext Not used - kept for backward compatibility
      */
     public RequestContext(
         Map<String, String> headers,
-        Map<String, String> queryParams,
+        Map<String, String> urlParams,
         String requestBody,
         RestContext restContext
     ) {
         this.headers = headers != null ? headers : new Map<String, String>();
-        this.queryParams = queryParams != null ? queryParams : new Map<String, String>();
+        this.urlParams = urlParams != null ? urlParams : new Map<String, String>();
         this.requestBody = requestBody;
-        this.pathParams = new Map<String, String>();
+        this.pathVariables = new Map<String, String>();
     }
     
     /**
@@ -53,17 +53,17 @@ public without sharing class RequestContext {
      * Get all query parameters
      * @return Map of parameter names to values
      */
-    public Map<String, String> getQueryParams() {
-        return this.queryParams;
+    public Map<String, String> getUrlParams() {
+        return this.urlParams;
     }
     
     /**
      * Get a specific query parameter value
-     * @param paramName The name of the parameter
+     * @param variableName The name of the parameter
      * @return The parameter value or null if not found
      */
-    public String getQueryParam(String paramName) {
-        return this.queryParams.get(paramName);
+    public String getQueryParam(String variableName) {
+        return this.urlParams.get(variableName);
     }
     
     /**
@@ -78,24 +78,24 @@ public without sharing class RequestContext {
      * Get all path parameters (populated by the matcher)
      * @return Map of path parameter names to values
      */
-    public Map<String, String> getPathParams() {
-        return this.pathParams;
+    public Map<String, String> getPathVariables() {
+        return this.pathVariables;
     }
     
     /**
      * Set path parameters (used by the matcher)
-     * @param pathParams Map of path parameter names to values
+     * @param pathVariables Map of path parameter variables to values
      */
-    public void setPathParams(Map<String, String> pathParams) {
-        this.pathParams = pathParams != null ? pathParams : new Map<String, String>();
+    public void setPathVariables(Map<String, String> pathVariables) {
+        this.pathVariables = pathVariables != null ? pathVariables : new Map<String, String>();
     }
     
     /**
      * Get a specific path parameter value
-     * @param paramName The name of the path parameter
-     * @return The parameter value or null if not found
+     * @param variableName The name of the path variable
+     * @return The variable value or null if not found
      */
-    public String getPathParam(String paramName) {
-        return this.pathParams.get(paramName);
+    public String getPathVariable(String variableName) {
+        return this.pathVariables.get(variableName);
     }
 }
