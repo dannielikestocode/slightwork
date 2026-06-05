@@ -1,9 +1,13 @@
 /**
- * Context object that encapsulates all information about an HTTP request.
- * This class is passed to Requestable implementations to provide access to headers,
- * parameters, body, and the underlying RestContext.
+ * Context object that encapsulates all information about an Apex REST request.
+ * This class is passed to Requestable implementations to provide access
+ * to headers, parameters, body, and the underlying RestContext.
+ * 
+ * @author Dannie @ Wynforce
+ * @since v66.0
+ * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_restrequest.htm
  */
-public class RequestContext {
+public without sharing class RequestContext {
     private Map<String, String> headers;
     private Map<String, String> queryParams;
     private String requestBody;

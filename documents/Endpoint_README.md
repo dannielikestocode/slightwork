@@ -171,17 +171,6 @@ The framework supports flexible URL patterns:
 /api/users/{userId}/orders/{orderId}   → /api/users/123/orders/456
 /api/{resource}/{id}                   → /api/accounts/001xxx
 ```
-
-### Priority Matching
-
-When multiple patterns could match a request, the `Priority__c` field determines the order:
-
-```
-Priority 10:  /api/users/special       (checked first)
-Priority 50:  /api/users/{id}          (checked second)
-Priority 100: /api/{resource}/{id}     (checked last)
-```
-
 ## Method-Level Control
 
 Control which HTTP methods are allowed per endpoint:
@@ -335,11 +324,6 @@ See `SampleRequestHandler.cls` for a complete working example demonstrating all 
 - Verify the Handler_Class__c value is correct
 - Ensure the handler class exists and is accessible
 - Confirm the handler implements the Requestable interface
-
-### Pattern Not Matching
-- Check for leading/trailing slashes in pattern
-- Verify dynamic segments use `{paramName}` syntax
-- Consider the Priority__c field for overlapping patterns
 
 ## Future Enhancements
 

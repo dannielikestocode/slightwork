@@ -7,14 +7,14 @@
  * - /api/sample/{id}
  * - /api/sample/{id}/details
  */
-public class SampleRequestHandler implements Requestable {
+public without sharing class RequestHandlerDemo implements Requestable {
     
     /**
      * Handle GET requests
      * Example: GET /api/sample?name=test&limit=10
      * Example: GET /api/sample/{id}
      */
-    public void handleGet(RequestContext context) {
+    public ResponseContext handleGet(RequestContext context) {
         RestResponse res = RestContext.response;
         
         // Access path parameters
@@ -45,13 +45,15 @@ public class SampleRequestHandler implements Requestable {
         res.addHeader('Content-Type', 'application/json');
         res.responseBody = Blob.valueOf(JSON.serialize(response));
         res.statusCode = 200;
+
+        return null;
     }
     
     /**
      * Handle POST requests
      * Example: POST /api/sample with JSON body
      */
-    public void handlePost(RequestContext context) {
+    public ResponseContext handlePost(RequestContext context) {
         RestResponse res = RestContext.response;
         
         // Parse request body
@@ -63,7 +65,7 @@ public class SampleRequestHandler implements Requestable {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
                 sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return;
+                return null;
             }
         }
         
@@ -79,13 +81,15 @@ public class SampleRequestHandler implements Requestable {
         res.addHeader('Content-Type', 'application/json');
         res.responseBody = Blob.valueOf(JSON.serialize(response));
         res.statusCode = 201; // Created
+
+        return null;
     }
     
     /**
      * Handle PUT requests
      * Example: PUT /api/sample/{id} with JSON body
      */
-    public void handlePut(RequestContext context) {
+    public ResponseContext handlePut(RequestContext context) {
         RestResponse res = RestContext.response;
         
         String id = context.getPathParam('id');
@@ -93,7 +97,7 @@ public class SampleRequestHandler implements Requestable {
         
         if (String.isBlank(id)) {
             sendError(res, 400, 'ID is required for PUT requests');
-            return;
+            return null;
         }
         
         // Parse request body
@@ -103,7 +107,7 @@ public class SampleRequestHandler implements Requestable {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
                 sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return;
+                return null;
             }
         }
         
@@ -120,13 +124,15 @@ public class SampleRequestHandler implements Requestable {
         res.addHeader('Content-Type', 'application/json');
         res.responseBody = Blob.valueOf(JSON.serialize(response));
         res.statusCode = 200;
+
+        return null;
     }
     
     /**
      * Handle PATCH requests
      * Example: PATCH /api/sample/{id} with partial JSON body
      */
-    public void handlePatch(RequestContext context) {
+    public ResponseContext handlePatch(RequestContext context) {
         RestResponse res = RestContext.response;
         
         String id = context.getPathParam('id');
@@ -134,7 +140,7 @@ public class SampleRequestHandler implements Requestable {
         
         if (String.isBlank(id)) {
             sendError(res, 400, 'ID is required for PATCH requests');
-            return;
+            return null;
         }
         
         // Parse request body
@@ -144,7 +150,7 @@ public class SampleRequestHandler implements Requestable {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
                 sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return;
+                return null;
             }
         }
         
@@ -161,20 +167,22 @@ public class SampleRequestHandler implements Requestable {
         res.addHeader('Content-Type', 'application/json');
         res.responseBody = Blob.valueOf(JSON.serialize(response));
         res.statusCode = 200;
+
+        return null;
     }
     
     /**
      * Handle DELETE requests
      * Example: DELETE /api/sample/{id}
      */
-    public void handleDelete(RequestContext context) {
+    public ResponseContext handleDelete(RequestContext context) {
         RestResponse res = RestContext.response;
         
         String id = context.getPathParam('id');
         
         if (String.isBlank(id)) {
             sendError(res, 400, 'ID is required for DELETE requests');
-            return;
+            return null;
         }
         
         // Build response
@@ -190,6 +198,8 @@ public class SampleRequestHandler implements Requestable {
         res.addHeader('Content-Type', 'application/json');
         res.responseBody = Blob.valueOf(JSON.serialize(response));
         res.statusCode = 200;
+
+        return null;
     }
     
     /**

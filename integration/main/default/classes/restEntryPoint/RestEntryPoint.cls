@@ -11,7 +11,7 @@
 @RestResource(urlMapping='/*')
 global with sharing class RestEntryPoint {
     /**
-     * Handle HTTP POST requests
+     * Intercept and process HTTP POST requests
      */
     @HttpPost
     global static void doPost() {
@@ -19,7 +19,7 @@ global with sharing class RestEntryPoint {
     }
 
     /**
-     * Handle HTTP GET requests
+     * Intercept and process HTTP GET requests
      */
     @HttpGet
     global static void doGet() {
@@ -27,7 +27,7 @@ global with sharing class RestEntryPoint {
     }
     
     /**
-     * Handle HTTP PUT requests
+     * Intercept and process HTTP PUT requests
      */
     @HttpPut
     global static void doPut() {
@@ -35,7 +35,7 @@ global with sharing class RestEntryPoint {
     }
     
     /**
-     * Handle HTTP PATCH requests
+     * Intercept and process HTTP PATCH requests
      */
     @HttpPatch
     global static void doPatch() {
@@ -43,7 +43,7 @@ global with sharing class RestEntryPoint {
     }
     
     /**
-     * Handle HTTP DELETE requests
+     * Intercept and process HTTP DELETE requests
      */
     @HttpDelete
     global static void doDelete() {
@@ -62,13 +62,13 @@ global with sharing class RestEntryPoint {
         try {
             // Extract request information
             String requestUri = req.requestURI;
-            Map<String, String> headers = parseHeaders(req.headers);
-            Map<String, String> queryParams = parseQueryParameters(req.params);
+            Map<String, String> headers = req.headers;
+            Map<String, String> urlParams = req.params;
             String requestBody = req.requestBody?.toString();
             
             // Match the request to an endpoint definition
             EndpointDefinitionMatcher matcher = new EndpointDefinitionMatcher();
-            EndpointDefinitionMatcher.MatchResult matchResult = matcher.match(requestUri, httpMethod);
+            MatchResult matchResult = matcher.match(requestUri, httpMethod);
             
             if (matchResult == null) {
                 sendError(res, 404, 'Endpoint not found');
@@ -78,7 +78,7 @@ global with sharing class RestEntryPoint {
             // Create request context
             RequestContext context = new RequestContext(
                 headers,
-                queryParams,
+                urlParams,
                 requestBody,
                 null
             );
@@ -106,50 +106,6 @@ global with sharing class RestEntryPoint {
             sendError(res, 500, 'Internal server error: ' + e.getMessage());
             System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage() + '\n' + e.getStackTraceString());
         }
-    }
-    
-    /**
-     * Parse HTTP headers into a map
-     * @param headers Map of header names to lists of values
-     * @return Map of header names to single string values (first value if multiple)
-     */
-    private static Map<String, String> parseHeaders(Map<String, String> headers) {
-        Map<String, String> parsedHeaders = new Map<String, String>();
-        
-        if (headers == null) {
-            return parsedHeaders;
-        }
-        
-        for (String headerName : headers.keySet()) {
-            String headerValue = headers.get(headerName);
-            if (headerValue != null) {
-                parsedHeaders.put(headerName.toLowerCase(), headerValue);
-            }
-        }
-        
-        return parsedHeaders;
-    }
-    
-    /**
-     * Parse query parameters into a map
-     * @param params Map of parameter names to lists of values
-     * @return Map of parameter names to single string values (first value if multiple)
-     */
-    private static Map<String, String> parseQueryParameters(Map<String, String> params) {
-        Map<String, String> parsedParams = new Map<String, String>();
-        
-        if (params == null) {
-            return parsedParams;
-        }
-        
-        for (String paramName : params.keySet()) {
-            String paramValue = params.get(paramName);
-            if (paramValue != null) {
-                parsedParams.put(paramName, paramValue);
-            }
-        }
-        
-        return parsedParams;
     }
     
     /**
@@ -224,5 +180,168 @@ global with sharing class RestEntryPoint {
         };
         
         res.responseBody = Blob.valueOf(JSON.serialize(errorResponse));
+    }
+
+    /**
+     * Matcher class that dynamically routes REST requests to appropriate handlers
+     * based on Endpoint Definition metadata. Supports static and dynamic routes with path parameters.
+     */
+    public without sharing class EndpointDefinitionMatcher {
+        private List<Endpoint_Definition__mdt> endpointDefinitions;
+        
+        /**
+         * Constructor that loads all active endpoint definitions
+         */
+        public EndpointDefinitionMatcher() {
+            this.endpointDefinitions = [
+                SELECT Id, DeveloperName, Endpoint_Pattern__c, Handler_Class__c,
+                    Success_Response_Code__c, 
+                    IsActive__c
+                FROM Endpoint_Definition__mdt
+                WHERE IsActive__c = true
+            ];
+        }
+        
+        /**
+         * Match an incoming request to an endpoint definition
+         * @param requestUri The request URI path
+         * @param httpMethod The HTTP method (GET, POST, etc.)
+         * @return MatchResult containing the matched definition and path parameters
+         */
+        public MatchResult match(String requestUri, String httpMethod) {
+            if (String.isBlank(requestUri) || String.isBlank(httpMethod)) {
+                return null;
+            }
+            
+            // Normalize the URI (remove leading/trailing slashes, query strings)
+            String normalizedUri = normalizeUri(requestUri);
+            
+            for (Endpoint_Definition__mdt definition : endpointDefinitions) {
+                // Check if the HTTP method is allowed
+                if (!isMethodAllowed(definition, httpMethod)) {
+                    continue;
+                }
+                
+                // Try to match the URI pattern
+                Map<String, String> pathParams = matchPattern(
+                    definition.Endpoint_Pattern__c,
+                    normalizedUri
+                );
+                
+                if (pathParams != null) {
+                    return new MatchResult(definition, pathParams);
+                }
+            }
+            
+            return null;
+        }
+        
+        /**
+         * Normalize the URI by removing query strings and extra slashes
+         * @param uri The raw URI
+         * @return Normalized URI
+         */
+        private String normalizeUri(String uri) {
+            // Remove query string
+            Integer queryIndex = uri.indexOf('?');
+            if (queryIndex > -1) {
+                uri = uri.substring(0, queryIndex);
+            }
+            
+            // Remove leading and trailing slashes
+            uri = uri.trim();
+            if (uri.startsWith('/')) {
+                uri = uri.substring(1);
+            }
+            if (uri.endsWith('/')) {
+                uri = uri.substring(0, uri.length() - 1);
+            }
+            
+            return uri;
+        }
+        
+        /**
+         * Check if the HTTP method is allowed for this endpoint
+         * @param definition The endpoint definition
+         * @param httpMethod The HTTP method to check
+         * @return True if the method is allowed
+         */
+        private Boolean isMethodAllowed(Endpoint_Definition__mdt definition, String httpMethod) {
+            if (String.isBlank(definition.Allowed_Methods__c)) {
+                return true; // If not specified, allow all methods
+            }
+            
+            List<String> allowedMethods = definition.Allowed_Methods__c.split('[,;]');
+            for (String method : allowedMethods) {
+                if (method.trim().equalsIgnoreCase(httpMethod)) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        /**
+         * Match a URI against a pattern and extract path parameters
+         * Pattern syntax:
+         *   - Static segments: /api/users
+         *   - Dynamic segments: /api/users/{id}
+         *   - Multiple params: /api/users/{userId}/posts/{postId}
+         * @param pattern The endpoint pattern from metadata
+         * @param uri The actual request URI
+         * @return Map of path parameter names to values, or null if no match
+         */
+        private Map<String, String> matchPattern(String pattern, String uri) {
+            if (String.isBlank(pattern)) {
+                return null;
+            }
+            
+            Map<String, String> pathParams = new Map<String, String>();
+            
+            // Normalize pattern
+            pattern = normalizeUri(pattern);
+            
+            // Split both pattern and URI into segments
+            List<String> patternSegments = pattern.split('/');
+            List<String> uriSegments = uri.split('/');
+            
+            // Must have same number of segments to match
+            if (patternSegments.size() != uriSegments.size()) {
+                return null;
+            }
+            
+            // Match each segment
+            for (Integer i = 0; i < patternSegments.size(); i++) {
+                String patternSegment = patternSegments[i];
+                String uriSegment = uriSegments[i];
+                
+                // Check if this is a dynamic segment (enclosed in curly braces)
+                if (patternSegment.startsWith('{') && patternSegment.endsWith('}')) {
+                    // Extract parameter name and store value
+                    String paramName = patternSegment.substring(1, patternSegment.length() - 1);
+                    pathParams.put(paramName, EncodingUtil.urlDecode(uriSegment, 'UTF-8'));
+                } else {
+                    // Static segment must match exactly (case-insensitive)
+                    if (!patternSegment.equalsIgnoreCase(uriSegment)) {
+                        return null;
+                    }
+                }
+            }
+            
+            return pathParams;
+        }
+    }
+
+    /**
+     * Inner class representing the result of a match operation
+     */
+    public class MatchResult {
+        public Endpoint_Definition__mdt definition { get; private set; }
+        public Map<String, String> pathParams { get; private set; }
+        
+        public MatchResult(Endpoint_Definition__mdt definition, Map<String, String> pathParams) {
+            this.definition = definition;
+            this.pathParams = pathParams;
+        }
     }
 }
