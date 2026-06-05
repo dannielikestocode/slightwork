@@ -63,32 +63,15 @@ global with sharing class RestEntryPoint {
     private static void processRequest(String httpMethod) {
         RestRequest request = RestContext.request;
         RestResponse response = RestContext.response;
-        
+
         try {
-            // Extract request information
-            String requestUri = request.requestURI;
-            Map<String, String> headers = request.headers;
-            Map<String, String> urlParams = request.params;
-            String requestBody = request.requestBody?.toString();
-            
             // Match the request to an endpoint definition
             EndpointDefinitionMatcher matcher = new EndpointDefinitionMatcher();
-            EndpointMatchResult matchResult = matcher.match(requestUri, httpMethod);
-            
-            // Create request context
-            RequestContext context = new RequestContext(
-                headers,
-                urlParams,
-                requestBody,
-                null
-            );
-            
-            // Set path parameters from the match
-            context.setPathVariables(matchResult.pathVariables);
+            EndpointMatchResult matchResult = matcher.match(request.requestURI, httpMethod);
             
             // Instantiate and invoke the handler
             Requestable handler = instantiateHandler(matchResult.definition.Handler_Class__c);
-            invokeHandler(handler, httpMethod, context);
+            invokeHandler(handler, httpMethod, request, response, matchResult.pathVariables);
         }
         catch (RestException e) {
             setErrorResponse(response, e.statusCode, e.getMessage());
@@ -124,27 +107,36 @@ global with sharing class RestEntryPoint {
     
     /**
      * Invoke the appropriate handler method based on HTTP verb
+     * 
      * @param handler The handler instance
      * @param httpMethod The HTTP method
-     * @param context The request context
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      * @throws IllegalArgumentException when an invalid HTTP method is provided
      */
-    private static void invokeHandler(Requestable handler, String httpMethod, RequestContext context) {
+    private static void invokeHandler(
+        Requestable handler, 
+        String httpMethod,
+        RestRequest request,
+        RestResponse response,
+        Map<String, String> pathVariables
+    ) {
         switch on httpMethod.toUpperCase() {
             when 'POST' {
-                handler.handlePost(context);
+                handler.handlePost(request, response, pathVariables);
             }
             when 'GET' {
-                handler.handleGet(context);
+                handler.handleGet(request, response, pathVariables);
             }
             when 'PUT' {
-                handler.handlePut(context);
+                handler.handlePut(request, response, pathVariables);
             }
             when 'PATCH' {
-                handler.handlePatch(context);
+                handler.handlePatch(request, response, pathVariables);
             }
             when 'DELETE' {
-                handler.handleDelete(context);
+                handler.handleDelete(request, response, pathVariables);
             }
             when else {
                 throw new IllegalArgumentException('Unsupported HTTP method: ' + httpMethod);

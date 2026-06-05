@@ -6,6 +6,9 @@
  * - /api/sample
  * - /api/sample/{id}
  * - /api/sample/{id}/details
+ * 
+ * @author Dannie @ Wynforce
+ * @since v66.0
  */
 public without sharing class RequestHandlerDemo implements Requestable {
     
@@ -14,9 +17,9 @@ public without sharing class RequestHandlerDemo implements Requestable {
      * Example: GET /api/sample?name=test&limit=10
      * Example: GET /api/sample/{id}
      */
-    public ResponseContext handleGet(RequestContext context) {
-        RestResponse res = RestContext.response;
+    public void handleGet(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
         
+        /*
         // Access path parameters
         String id = context.getPathParam('id');
         
@@ -42,20 +45,18 @@ public without sharing class RequestHandlerDemo implements Requestable {
         };
         
         // Set response
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(response));
-        res.statusCode = 200;
-
-        return null;
+        response.addHeader('Content-Type', 'application/json');
+        response.responseBody = Blob.valueOf(JSON.serialize(response));
+        response.statusCode = 200;     */   
     }
     
     /**
      * Handle POST requests
      * Example: POST /api/sample with JSON body
      */
-    public ResponseContext handlePost(RequestContext context) {
-        RestResponse res = RestContext.response;
+    public void handlePost(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
         
+        /*
         // Parse request body
         String requestBody = context.getRequestBody();
         Map<String, Object> requestData = null;
@@ -64,8 +65,8 @@ public without sharing class RequestHandlerDemo implements Requestable {
             try {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
-                sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return null;
+                sendError(response, 400, 'Invalid JSON in request body: ' + e.getMessage());
+                return;
             }
         }
         
@@ -78,26 +79,26 @@ public without sharing class RequestHandlerDemo implements Requestable {
         };
         
         // Set response
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(response));
-        res.statusCode = 201; // Created
+        response.addHeader('Content-Type', 'application/json');
+        response.responseBody = Blob.valueOf(JSON.serialize(response));
+        response.statusCode = 201; // Created
 
-        return null;
+        */
     }
     
     /**
      * Handle PUT requests
      * Example: PUT /api/sample/{id} with JSON body
      */
-    public ResponseContext handlePut(RequestContext context) {
-        RestResponse res = RestContext.response;
+    public void handlePut(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+        /*
         
         String id = context.getPathParam('id');
         String requestBody = context.getRequestBody();
         
         if (String.isBlank(id)) {
-            sendError(res, 400, 'ID is required for PUT requests');
-            return null;
+            sendError(response, 400, 'ID is required for PUT requests');
+            return;
         }
         
         // Parse request body
@@ -106,8 +107,8 @@ public without sharing class RequestHandlerDemo implements Requestable {
             try {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
-                sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return null;
+                sendError(response, 400, 'Invalid JSON in request body: ' + e.getMessage());
+                return;
             }
         }
         
@@ -121,26 +122,26 @@ public without sharing class RequestHandlerDemo implements Requestable {
         };
         
         // Set response
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(response));
-        res.statusCode = 200;
-
-        return null;
+        response.addHeader('Content-Type', 'application/json');
+        response.responseBody = Blob.valueOf(JSON.serialize(response));
+        response.statusCode = 200;
+*/
+        
     }
     
     /**
      * Handle PATCH requests
      * Example: PATCH /api/sample/{id} with partial JSON body
      */
-    public ResponseContext handlePatch(RequestContext context) {
-        RestResponse res = RestContext.response;
+    public void handlePatch(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+        /*
         
         String id = context.getPathParam('id');
         String requestBody = context.getRequestBody();
         
         if (String.isBlank(id)) {
-            sendError(res, 400, 'ID is required for PATCH requests');
-            return null;
+            sendError(response, 400, 'ID is required for PATCH requests');
+            return;
         }
         
         // Parse request body
@@ -149,8 +150,8 @@ public without sharing class RequestHandlerDemo implements Requestable {
             try {
                 requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
             } catch (Exception e) {
-                sendError(res, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return null;
+                sendError(response, 400, 'Invalid JSON in request body: ' + e.getMessage());
+                return;
             }
         }
         
@@ -164,25 +165,25 @@ public without sharing class RequestHandlerDemo implements Requestable {
         };
         
         // Set response
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(response));
-        res.statusCode = 200;
-
-        return null;
+        response.addHeader('Content-Type', 'application/json');
+        response.responseBody = Blob.valueOf(JSON.serialize(response));
+        response.statusCode = 200;
+*/
+        
     }
     
     /**
      * Handle DELETE requests
      * Example: DELETE /api/sample/{id}
      */
-    public ResponseContext handleDelete(RequestContext context) {
-        RestResponse res = RestContext.response;
+    public void handleDelete(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
         
+        /*
         String id = context.getPathParam('id');
         
         if (String.isBlank(id)) {
-            sendError(res, 400, 'ID is required for DELETE requests');
-            return null;
+            sendError(response, 400, 'ID is required for DELETE requests');
+            return;
         }
         
         // Build response
@@ -195,26 +196,10 @@ public without sharing class RequestHandlerDemo implements Requestable {
         };
         
         // Set response
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(response));
-        res.statusCode = 200;
+        response.addHeader('Content-Type', 'application/json');
+        response.responseBody = Blob.valueOf(JSON.serialize(response));
+        response.statusCode = 200;
 
-        return null;
-    }
-    
-    /**
-     * Helper method to send error responses
-     */
-    private void sendError(RestResponse res, Integer statusCode, String message) {
-        Map<String, Object> errorResponse = new Map<String, Object>{
-            'error' => true,
-            'message' => message,
-            'statusCode' => statusCode,
-            'timestamp' => DateTime.now().format()
-        };
-        
-        res.statusCode = statusCode;
-        res.addHeader('Content-Type', 'application/json');
-        res.responseBody = Blob.valueOf(JSON.serialize(errorResponse));
+        return;*/
     }
 }

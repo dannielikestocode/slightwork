@@ -1,7 +1,6 @@
 /**
  * Interface that must be implemented by any class that handles Apex REST requests
- * through the RestEntryPoint. Each HTTP verb has a corresponding handler method 
- * that receives a RequestContext containing all request information.
+ * through the RestEntryPoint. 
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
@@ -9,36 +8,46 @@
 public interface Requestable {
     /**
      * Handle HTTP POST requests
-     * @param context The request context containing headers, params, body, and RestContext
-     * @return The response context to be returned for a request
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    ResponseContext handlePost(RequestContext context);
+    void handlePost(RestRequest request, RestResponse response, Map<String, String> pathVariables);
 
     /**
      * Handle HTTP GET requests
-     * @param context The request context containing headers, params, body, and RestContext
-     * @return The response context to be returned for a request
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    ResponseContext handleGet(RequestContext context);
+    void handleGet(RestRequest request, RestResponse response, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP PUT requests
-     * @param context The request context containing headers, params, body, and RestContext
-     * @return The response context to be returned for a request
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    ResponseContext handlePut(RequestContext context);
+    void handlePut(RestRequest request, RestResponse response, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP PATCH requests
-     * @param context The request context containing headers, params, body, and RestContext
-     * @return The response context to be returned for a request
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    ResponseContext handlePatch(RequestContext context);
+    void handlePatch(RestRequest request, RestResponse response, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP DELETE requests
-     * @param context The request context containing headers, params, body, and RestContext
-     * @return The response context to be returned for a request
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    ResponseContext handleDelete(RequestContext context);
+    void handleDelete(RestRequest request, RestResponse response, Map<String, String> pathVariables);
 }

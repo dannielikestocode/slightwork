@@ -276,8 +276,8 @@ private class UserRequestHandlerTest {
         RestRequest req = new RestRequest();
         req.requestURI = '/services/apexrest/api/users/001xx000003DGb2AAG';
         req.httpMethod = 'GET';
-        RestContext.request = req;
-        RestContext.response = new RestResponse();
+        RestRequest = req;
+        RestResponse = new RestResponse();
         
         // Create context
         Map<String, String> pathParams = new Map<String, String>{'id' => '001xx000003DGb2AAG'};
@@ -285,7 +285,7 @@ private class UserRequestHandlerTest {
             new Map<String, String>(),
             new Map<String, String>(),
             null,
-            RestContext.request.getRestContext()
+            RestRequest.getRestContext()
         );
         ctx.setPathParams(pathParams);
         
@@ -296,7 +296,7 @@ private class UserRequestHandlerTest {
         Test.stopTest();
         
         // Assert
-        System.assertEquals(200, RestContext.response.statusCode);
+        System.assertEquals(200, RestResponse.statusCode);
     }
 }
 ```
