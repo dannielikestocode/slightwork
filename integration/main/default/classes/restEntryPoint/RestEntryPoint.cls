@@ -148,7 +148,7 @@ global with sharing class RestEntryPoint {
      * Sends an error response as a collection of objects,
      * following the Salesforce format.
      * 
-     * @param res The RestResponse to populate
+     * @param response The RestResponse to populate
      * @param statusCode HTTP status code
      * @param message Error message
      */
