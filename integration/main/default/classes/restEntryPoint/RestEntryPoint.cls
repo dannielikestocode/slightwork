@@ -61,15 +61,15 @@ global with sharing class RestEntryPoint {
      * @param httpMethod The HTTP method being invoked
      */
     private static void processRequest(String httpMethod) {
-        RestRequest req = RestContext.request;
-        RestResponse res = RestContext.response;
+        RestRequest request = RestContext.request;
+        RestResponse response = RestContext.response;
         
         try {
             // Extract request information
-            String requestUri = req.requestURI;
-            Map<String, String> headers = req.headers;
-            Map<String, String> queryParams = req.params;
-            String requestBody = req.requestBody?.toString();
+            String requestUri = request.requestURI;
+            Map<String, String> headers = request.headers;
+            Map<String, String> urlParams = request.params;
+            String requestBody = request.requestBody?.toString();
             
             // Match the request to an endpoint definition
             EndpointDefinitionMatcher matcher = new EndpointDefinitionMatcher();
@@ -78,7 +78,7 @@ global with sharing class RestEntryPoint {
             // Create request context
             RequestContext context = new RequestContext(
                 headers,
-                queryParams,
+                urlParams,
                 requestBody,
                 null
             );
@@ -88,53 +88,38 @@ global with sharing class RestEntryPoint {
             
             // Instantiate and invoke the handler
             Requestable handler = instantiateHandler(matchResult.definition.Handler_Class__c);
-            if (handler == null) {
-                sendError(res, 500, 'Handler class not found or invalid: ' + matchResult.definition.Handler_Class__c);
-                return;
-            }
-            
-            // Delegate to appropriate handler method based on HTTP verb
             invokeHandler(handler, httpMethod, context);
-            
-            // Set success response code if not already set by handler
-            if (res.statusCode == null) {
-                Integer successCode = matchResult.definition.Success_Response_Code__c?.intValue();
-                res.statusCode = successCode != null ? successCode : 200;
-            }
-            
         }
         catch (RestException e) {
-            // TODO: Implement
+            setErrorResponse(response, e.statusCode, e.getMessage());
+            System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage());
         } 
         catch (Exception e) {
-            sendError(res, 500, 'Internal server error: ' + e.getMessage());
-            System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage() + '\n' + e.getStackTraceString());
+            setErrorResponse(response, 500, 'Internal Server Error');
+            System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage());
         }
     }
     
     /**
-     * Instantiate a handler class by name
+     * Instantiates a handler class of the Requestable interface
+     * 
      * @param className The fully qualified class name
-     * @return Instance of Requestable or null if instantiation fails
+     * @return Instance of Requestable
+     * @throws RestException when an invalid class is provided
      */
     private static Requestable instantiateHandler(String className) {
-        try {
-            Type handlerType = Type.forName(className);
-            if (handlerType == null) {
-                return null;
-            }
-            
-            Object handlerInstance = handlerType.newInstance();
-            if (!(handlerInstance instanceof Requestable)) {
-                System.debug(LoggingLevel.ERROR, 'Handler class does not implement Requestable: ' + className);
-                return null;
-            }
-            
-            return (Requestable) handlerInstance;
-        } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error instantiating handler: ' + className + ' - ' + e.getMessage());
-            return null;
+        Type handlerType = Type.forName(String.isNotBlank(className) ? className : '');
+        if (handlerType == null) {
+            // NHF = No Handler Found
+            throw new RestException('Internal Server Error (NHF)', HttpContext.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
         }
+        
+        Object handlerInstance = handlerType.newInstance();
+        if (!(handlerInstance instanceof Requestable)) {
+            // INH = Invalid Handler
+            throw new RestException('Internal Server Error (INH)', HttpContext.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+        }
+        return (Requestable)handlerInstance;
     }
     
     /**
@@ -142,6 +127,7 @@ global with sharing class RestEntryPoint {
      * @param handler The handler instance
      * @param httpMethod The HTTP method
      * @param context The request context
+     * @throws IllegalArgumentException when an invalid HTTP method is provided
      */
     private static void invokeHandler(Requestable handler, String httpMethod, RequestContext context) {
         switch on httpMethod.toUpperCase() {
@@ -167,23 +153,20 @@ global with sharing class RestEntryPoint {
     }
     
     /**
-     * Send an error response
+     * Sends an error response as a collection of objects,
+     * following the Salesforce format.
+     * 
      * @param res The RestResponse to populate
      * @param statusCode HTTP status code
      * @param message Error message
      */
-    private static void sendError(RestResponse res, Integer statusCode, String message) {
-        res.statusCode = statusCode;
-        res.addHeader('Content-Type', 'application/json');
-        
+    private static void setErrorResponse(RestResponse response, Integer statusCode, String message) {
+        response.statusCode = statusCode == null ? 500 : statusCode;
+        response.addHeader('Content-Type', 'application/json');
         Map<String, Object> errorResponse = new Map<String, Object>{
-            'error' => true,
-            'message' => message,
-            'statusCode' => statusCode,
-            'timestamp' => DateTime.now().format('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'')
+            'error' => message
         };
-        
-        res.responseBody = Blob.valueOf(JSON.serialize(errorResponse));
+        response.responseBody = Blob.valueOf(JSON.serialize(errorResponse));
     }
 
     /**
@@ -203,6 +186,7 @@ global with sharing class RestEntryPoint {
          * @param requestUri The request URI path
          * @param httpMethod The HTTP method (GET, POST, etc.)
          * @return The result containing the matched definition and path parameters
+         * @throws RestException for an unsupported HTTP method or an endpoint definition cannot be matched
          */
         public EndpointMatchResult match(String requestUri, String httpMethod) {
             String normalizedRequestUri = normalizeUri(requestUri);
