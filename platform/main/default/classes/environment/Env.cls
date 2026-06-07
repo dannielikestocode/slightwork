@@ -4,7 +4,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/platform/environment-variable-manager.html
+ * @see https://slightwork.dev/modules/platform/env.html
  */ 
 public inherited sharing class Env {
     /**
