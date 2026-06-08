@@ -25,6 +25,7 @@ public inherited sharing class AccountsServiceDemo {
     /**
      * Simulates the creation of an account 
      * 
+     * @param accountName The name of the account to create
      * @return The Id of the created account
      */
     public Integer createAccount(String accountName) {
@@ -67,7 +68,7 @@ public inherited sharing class AccountsServiceDemo {
 
         AccountDTO accountToUpdate = this.accountsList.get(accountId);
         if (accountToUpdate == null) {
-            throw new QueryException('Account cannot be found for Id ' + accountId);
+            throw new QueryException('Account to update cannot be found for Id ' + accountId);
         }
 
         this.accountsList.put(accountId, new AccountDTO(accountId, accountName));
@@ -80,11 +81,9 @@ public inherited sharing class AccountsServiceDemo {
      */
     public void deleteAccountById(Integer accountId) {
         Integer startingNumberOfAccounts = this.accountsList.size();
-        this.accountsList.remove(accountId);
-
-        // If the number of accounts is still the same, the account Id did not exist
-        if (startingNumberOfAccounts == this.accountsList.size()) {
-            throw new QueryException('Account cannot be found for Id ' + accountId);
+        Object deletedAccount = this.accountsList.remove(accountId);
+        if (deletedAccount == null) {
+            throw new QueryException('Account to delete cannot be found for Id ' + accountId);
         }
     }
 

@@ -6,8 +6,8 @@
  * Endpoint_Definition__mdt custom metadata records.
  *
  * Confirmed custom metadata endpoint patterns:
- *   - GET    /accounts/{id}   → handler reads accountId from request.params
  *   - POST   /accounts        → handler deserializes AccountDTO from body
+ *   - GET    /accounts/{id}   → handler reads accountId from request.params
  *   - PUT    /accounts/{id}   → handler reads id from pathVariables
  *   - PATCH  /accounts/{id}   → handler reads id from pathVariables
  *   - DELETE /accounts/{id}   → handler reads accountId from request.params
