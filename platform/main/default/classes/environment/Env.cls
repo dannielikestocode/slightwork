@@ -25,7 +25,7 @@ public inherited sharing class Env {
      * First checks the in-memory map, then queries 
      * persisted records if not found.
      * 
-     * @param key The key identifier for the environment variable
+     * @param developerName The identifier for the environment variable
      * @return The EnvironmentVariable wrapper if found, null otherwise
      */
     public static EnvironmentVariable get(String developerName) {

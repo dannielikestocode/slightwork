@@ -2,22 +2,45 @@
  * Sample implementation of the Requestable interface demonstrating
  * how to handle REST requests through the RestEntryPoint framework.
  * 
- * This handler can be configured in Endpoint_Definition__mdt with patterns like:
- * - /api/sample
- * - /api/sample/{id}
- * - /api/sample/{id}/details
- * 
  * @author Dannie @ Wynforce
  * @since v66.0
  */
-public without sharing class RequestHandlerDemo implements Requestable {
+public inherited sharing class AccountsRequestHandlerDemo implements Requestable {
+    /**
+     * Properties
+     */
+    public final static Integer NUMBER_OF_ACCOUNTS_TO_CREATE = 10;
+    private final AccountsServiceDemo accountsService {get; set;}
     
     /**
-     * Handle GET requests
-     * Example: GET /api/sample?name=test&limit=10
-     * Example: GET /api/sample/{id}
+     * No-arg constructor
      */
-    public void handleGet(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+    public AccountsRequestHandlerDemo() {
+        this.accountsService = new AccountsServiceDemo(NUMBER_OF_ACCOUNTS_TO_CREATE);
+    }
+
+    /**
+     * Handle HTTP POST requests
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
+     * @param pathVariables The path variables extracted from the endpoint path
+     */
+    public void handlePost(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables) {
+        AccountsServiceDemo.AccountDTO newAccount = (AccountsServiceDemo.AccountDTO)JSON.deserialize(request.requestBody.toString(), AccountsServiceDemo.AccountDTO.class);
+        this.accountsService.createAccount(newAccount.accountName);
+    }
+    
+    /**
+     * Handle HTTP GET requests
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
+     * @param pathVariables The path variables extracted from the endpoint path
+     */
+    public void handleGet(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables) {
         
         /*
         // Access path parameters
@@ -51,46 +74,14 @@ public without sharing class RequestHandlerDemo implements Requestable {
     }
     
     /**
-     * Handle POST requests
-     * Example: POST /api/sample with JSON body
+     * Handle HTTP PUT requests
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    public void handlePost(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
-        
-        /*
-        // Parse request body
-        String requestBody = context.getRequestBody();
-        Map<String, Object> requestData = null;
-        
-        if (String.isNotBlank(requestBody)) {
-            try {
-                requestData = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
-            } catch (Exception e) {
-                sendError(response, 400, 'Invalid JSON in request body: ' + e.getMessage());
-                return;
-            }
-        }
-        
-        // Build response
-        Map<String, Object> response = new Map<String, Object>{
-            'method' => 'POST',
-            'message' => 'Sample POST handler executed successfully',
-            'receivedData' => requestData,
-            'timestamp' => DateTime.now().format()
-        };
-        
-        // Set response
-        response.addHeader('Content-Type', 'application/json');
-        response.responseBody = Blob.valueOf(JSON.serialize(response));
-        response.statusCode = 201; // Created
-
-        */
-    }
-    
-    /**
-     * Handle PUT requests
-     * Example: PUT /api/sample/{id} with JSON body
-     */
-    public void handlePut(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+    public void handlePut(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables) {
         /*
         
         String id = context.getPathParam('id');
@@ -130,10 +121,14 @@ public without sharing class RequestHandlerDemo implements Requestable {
     }
     
     /**
-     * Handle PATCH requests
-     * Example: PATCH /api/sample/{id} with partial JSON body
+     * Handle HTTP PATCH requests
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    public void handlePatch(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+    public void handlePatch(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables) {
         /*
         
         String id = context.getPathParam('id');
@@ -173,33 +168,14 @@ public without sharing class RequestHandlerDemo implements Requestable {
     }
     
     /**
-     * Handle DELETE requests
-     * Example: DELETE /api/sample/{id}
+     * Handle HTTP DELETE requests
+     * 
+     * @param request The REST request context
+     * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
+     * @param pathVariables The path variables extracted from the endpoint path
      */
-    public void handleDelete(RestRequest request, RestResponse response, Map<String, String> pathVariables) {
+    public void handleDelete(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables) {
         
-        /*
-        String id = context.getPathParam('id');
-        
-        if (String.isBlank(id)) {
-            sendError(response, 400, 'ID is required for DELETE requests');
-            return;
-        }
-        
-        // Build response
-        Map<String, Object> response = new Map<String, Object>{
-            'method' => 'DELETE',
-            'message' => 'Sample DELETE handler executed successfully',
-            'id' => id,
-            'deleted' => true,
-            'timestamp' => DateTime.now().format()
-        };
-        
-        // Set response
-        response.addHeader('Content-Type', 'application/json');
-        response.responseBody = Blob.valueOf(JSON.serialize(response));
-        response.statusCode = 200;
-
-        return;*/
     }
 }

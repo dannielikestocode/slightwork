@@ -11,43 +11,48 @@ public interface Requestable {
      * 
      * @param request The REST request context
      * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
      * @param pathVariables The path variables extracted from the endpoint path
      */
-    void handlePost(RestRequest request, RestResponse response, Map<String, String> pathVariables);
+    void handlePost(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables);
 
     /**
      * Handle HTTP GET requests
      * 
      * @param request The REST request context
      * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
      * @param pathVariables The path variables extracted from the endpoint path
      */
-    void handleGet(RestRequest request, RestResponse response, Map<String, String> pathVariables);
+    void handleGet(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP PUT requests
      * 
      * @param request The REST request context
      * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
      * @param pathVariables The path variables extracted from the endpoint path
      */
-    void handlePut(RestRequest request, RestResponse response, Map<String, String> pathVariables);
+    void handlePut(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP PATCH requests
      * 
      * @param request The REST request context
      * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
      * @param pathVariables The path variables extracted from the endpoint path
      */
-    void handlePatch(RestRequest request, RestResponse response, Map<String, String> pathVariables);
+    void handlePatch(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables);
     
     /**
      * Handle HTTP DELETE requests
      * 
      * @param request The REST request context
      * @param response The REST response context
+     * @param endpointDefinition The endpoint definition
      * @param pathVariables The path variables extracted from the endpoint path
      */
-    void handleDelete(RestRequest request, RestResponse response, Map<String, String> pathVariables);
+    void handleDelete(RestRequest request, RestResponse response,  Endpoint_Definition__mdt endpointDefinition, Map<String, String> pathVariables);
 }

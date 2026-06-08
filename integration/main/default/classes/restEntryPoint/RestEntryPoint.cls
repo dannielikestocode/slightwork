@@ -71,13 +71,17 @@ global with sharing class RestEntryPoint {
             
             // Instantiate and invoke the handler
             Requestable handler = instantiateHandler(matchResult.definition.Handler_Class__c);
-            invokeHandler(handler, httpMethod, request, response, matchResult.pathVariables);
+            invokeHandler(handler, httpMethod, request, response, matchResult);
         }
-        catch (RestException e) {
+        catch(JSONException e) {
+            setErrorResponse(response, 400, e.getMessage());
+            System.debug(LoggingLevel.ERROR, 'JSON deserialization error: ' + e.getMessage());
+        }
+        catch(RestException e) {
             setErrorResponse(response, e.statusCode, e.getMessage());
             System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage());
         } 
-        catch (Exception e) {
+        catch(Exception e) {
             setErrorResponse(response, 500, 'Internal Server Error');
             System.debug(LoggingLevel.ERROR, 'RestEntryPoint error: ' + e.getMessage());
         }
@@ -120,23 +124,23 @@ global with sharing class RestEntryPoint {
         String httpMethod,
         RestRequest request,
         RestResponse response,
-        Map<String, String> pathVariables
+        EndpointMatchResult matchResult
     ) {
         switch on httpMethod.toUpperCase() {
             when 'POST' {
-                handler.handlePost(request, response, pathVariables);
+                handler.handlePost(request, response, matchResult.definition, matchResult.pathVariables);
             }
             when 'GET' {
-                handler.handleGet(request, response, pathVariables);
+                handler.handleGet(request, response, matchResult.definition, matchResult.pathVariables);
             }
             when 'PUT' {
-                handler.handlePut(request, response, pathVariables);
+                handler.handlePut(request, response, matchResult.definition, matchResult.pathVariables);
             }
             when 'PATCH' {
-                handler.handlePatch(request, response, pathVariables);
+                handler.handlePatch(request, response, matchResult.definition, matchResult.pathVariables);
             }
             when 'DELETE' {
-                handler.handleDelete(request, response, pathVariables);
+                handler.handleDelete(request, response, matchResult.definition, matchResult.pathVariables);
             }
             when else {
                 throw new IllegalArgumentException('Unsupported HTTP method: ' + httpMethod);
@@ -182,32 +186,42 @@ global with sharing class RestEntryPoint {
          */
         public EndpointMatchResult match(String requestUri, String httpMethod) {
             String normalizedRequestUri = normalizeUri(requestUri);
-            EndpointMatchResult result;
+            List<EndpointMatchResult> matchedEndpoints = new List<EndpointMatchResult>();
             for (Endpoint_Definition__mdt endpointDefinition : this.endpointDefinitions.values()) {
-                if (endpointDefinition.Is_Active__c != null) {
+                // Active endpoints only
+                if (endpointDefinition.Is_Active__c != true) {
                     continue;
                 }
 
-                // Attempt to find a matching endpoint definition
-                result = matchEndpointDefinition(
-                    endpointDefinition,
-                    normalizedRequestUri
-                );
-
-                // Only break when a result is found. Otherwise, continue
-                // evaluating other definitions to find a match
-                if (result != null) {
-                    if (!isMethodAllowed(endpointDefinition, httpMethod)) {
-                        throw new RestException('Method not allowed for endpoint', HttpContext.StatusCode.HTTP_METHOD_NOT_ALLOWED);
-                    }
-                    break;
+                // Attempt to find a all matching endpoint definitions and add
+                // them to the collection
+                EndpointMatchResult matchedEndpoint = matchEndpointDefinition(endpointDefinition, normalizedRequestUri);
+                if (matchedEndpoint != null) {
+                    matchedEndpoints.add(matchedEndpoint);
                 }
             }
             
-            if (result == null) {
+            // Final endpoint resolution is based on the
+            // HTTP method, which means there cannot be
+            // multiple endpoints with the same pattern
+            // and HTTP method
+            EndpointMatchResult finalEndpoint;
+            if (matchedEndpoints.isEmpty()) {
                 throw new RestException('Endpoint not found or is invalid', HttpContext.StatusCode.HTTP_NOT_FOUND);
             }
-            return result;
+            else {
+                for (EndpointMatchResult matchedEndpoint: matchedEndpoints) {
+                    if (httpMethod.equalsIgnoreCase(finalEndpoint.definition.Http_Method__c)) {
+                        finalEndpoint = matchedEndpoint;
+                        break;
+                    }
+                }
+            }
+
+            if (finalEndpoint == null) {
+                throw new RestException('Method not allowed for endpoint', HttpContext.StatusCode.HTTP_METHOD_NOT_ALLOWED);
+            }
+            return finalEndpoint;
         }
         
         /**
@@ -278,32 +292,6 @@ global with sharing class RestEntryPoint {
                 }
             }
             return new EndpointMatchResult(endpointDefinition, pathVariables);
-        }
-        
-        /**
-         * Check if the HTTP method is allowed for this endpoint
-         * 
-         * @param definition The endpoint definition
-         * @param httpMethod The HTTP method to check
-         * @return True if the method is allowed
-         */
-        private Boolean isMethodAllowed(Endpoint_Definition__mdt definition, String httpMethod) {
-            if (httpMethod == HttpContext.POST_METHOD && definition.POST_Enabled__c == true) {
-                return true;
-            }
-            else if (httpMethod == HttpContext.GET_METHOD && definition.GET_Enabled__c == true) {
-                return true;
-            }
-            else if (httpMethod == HttpContext.PUT_METHOD && definition.PUT_Enabled__c == true) {
-                return true;
-            }
-            else if (httpMethod == HttpContext.PATCH_METHOD && definition.PATCH_Enabled__c == true) {
-                return true;
-            }
-            else if (httpMethod == HttpContext.DELETE_METHOD && definition.DELETE_Enabled__c == true) {
-                return true;
-            }
-            return false;
         }
     }
 
