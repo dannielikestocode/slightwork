@@ -56,7 +56,7 @@ public inherited sharing class AccountsServiceDemo {
      * @param accountId The Id of the account to update
      * @param accountName The new name of the account
      */
-    public void updateAccount(Integer accountId, String accountName) {
+    public void updateAccountById(Integer accountId, String accountName) {
         if (accountId == null) {
             throw new IllegalArgumentException('Account Id must be provided');
         }
@@ -78,7 +78,7 @@ public inherited sharing class AccountsServiceDemo {
      * 
      * @param accountId The Id of the account to delete
      */
-    public void deleteAccount(Integer accountId) {
+    public void deleteAccountById(Integer accountId) {
         Integer startingNumberOfAccounts = this.accountsList.size();
         this.accountsList.remove(accountId);
 
