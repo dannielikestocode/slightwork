@@ -8,8 +8,8 @@ public inherited sharing class AccountsServiceDemo {
     /**
      * Properties
      */
-    private final Map<Integer, AccountDTO> accountsList = new Map<Integer, AccountDTO>();
-    private Integer currentNumberOfAccounts {get; set;}
+    private final Map<Integer, AccountDTO> accountsList {get;set;}
+    private Integer currentNumberOfAccounts {get;set;}
 
     /**
      * Default, no-arg constructor

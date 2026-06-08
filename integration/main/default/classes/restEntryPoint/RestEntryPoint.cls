@@ -211,7 +211,7 @@ global with sharing class RestEntryPoint {
             }
             else {
                 for (EndpointMatchResult matchedEndpoint: matchedEndpoints) {
-                    if (httpMethod.equalsIgnoreCase(finalEndpoint.definition.Http_Method__c)) {
+                    if (httpMethod.equalsIgnoreCase(matchedEndpoint.definition.Http_Method__c)) {
                         finalEndpoint = matchedEndpoint;
                         break;
                     }
