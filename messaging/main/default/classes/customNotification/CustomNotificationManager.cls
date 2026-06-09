@@ -7,7 +7,7 @@
  * @see https://slightwork.dev/modules/messaging/custom-notification-manager
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Messaging_CustomNotification.htm
  */
-public inherited sharing class CustomNotificationManager {
+public without sharing class CustomNotificationManager {
     /**
      * Constants
      */
@@ -75,7 +75,7 @@ public inherited sharing class CustomNotificationManager {
      * 
      * @param title The notification title (max 100 characters recommended)
      * @return Instance of this class for method chaining
-     * @throws IllegalArgumentException if title is blank
+     * @throws IllegalArgumentException if title is blank or invalid
      */
     public CustomNotificationManager withTitle(String title) {
         if (String.isBlank(title)) {
@@ -95,7 +95,7 @@ public inherited sharing class CustomNotificationManager {
      * 
      * @param body The notification body
      * @return Instance of this class for method chaining
-     * @throws IllegalArgumentException if body is blank
+     * @throws IllegalArgumentException if body is blank or invalid
      */
     public CustomNotificationManager withBody(String body) {
         if (String.isBlank(body)) {
@@ -228,7 +228,7 @@ public inherited sharing class CustomNotificationManager {
             isSuccess = true;
         }
         catch (Exception e) {
-            System.debug('Failed to send custom notification: ' + e.getMessage());
+            System.debug(LoggingLevel.ERROR, 'Failed to send custom notification: ' + e.getMessage());
         }
         return new SendResult(isSuccess);
     }
@@ -236,6 +236,8 @@ public inherited sharing class CustomNotificationManager {
     /**
      * Validates the logical state of notification properties
      * before the notification can be sent.
+     * 
+     * @throws IllegalStateException for any property within an invalid state
      */
     @TestVisible
     private void validateState() {

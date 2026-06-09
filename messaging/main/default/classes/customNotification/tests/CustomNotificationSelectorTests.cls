@@ -1,6 +1,5 @@
 /**
- * Test class for CustomNotificationSelector.
- * Validates queries used to fetch Custom Notification Types.
+ * Test suite for the CustomNotificationSelector class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0

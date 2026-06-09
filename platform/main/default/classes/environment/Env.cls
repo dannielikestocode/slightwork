@@ -6,7 +6,7 @@
  * @since v66.0
  * @see https://slightwork.dev/modules/platform/env.html
  */ 
-public inherited sharing class Env {
+public without sharing class Env {
     /**
      * Derived Properties
      */

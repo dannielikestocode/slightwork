@@ -1,9 +1,9 @@
 /**
- * Test class for ENV.
+ * Test suite for the Env class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see ENV.cls
+ * @see Env.cls
  */
 @IsTest
 private without sharing class EnvTests {

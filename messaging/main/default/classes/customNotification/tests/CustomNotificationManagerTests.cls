@@ -1,6 +1,5 @@
 /**
- * Test class for CustomNotificationManager
- * Tests all methods including constructor, builder methods, and send functionality
+ * Test suite for the CustomNotificationManager class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0

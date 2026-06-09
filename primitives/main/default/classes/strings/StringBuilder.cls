@@ -6,16 +6,12 @@
  * @since v66.0
  * @see https://slightwork.dev/modules/primitives/string-builder.html
  */
-public inherited sharing class StringBuilder {
+public without sharing class StringBuilder {
     /**
      * Properties
      */
     private final List<String> stringParts {get;set;}
     private final Set<String> existingValues {get;set;}
-
-    /**
-     * Builder Option Properties
-     */
     private NullValueAction actionOnNullValue {get;set;}
     private Boolean trimValue {get;set;}
     private Boolean skipBlanks {get;set;}
@@ -40,12 +36,12 @@ public inherited sharing class StringBuilder {
     }
 
     /**
-     *  Action-based Enums
+     *  Enums
      */
     public enum NullValueAction {
         CONVERT_TO_BLANK,
-        CONVERT_TO_SINGLE_SPACE,
-        CONVERT_TO_LITERAL
+        CONVERT_TO_LITERAL,
+        CONVERT_TO_SINGLE_SPACE
     }
 
     public enum MaxLengthAction {
@@ -57,11 +53,8 @@ public inherited sharing class StringBuilder {
      * No-arg, default constructor
      */
     public StringBuilder() {
-        // String Parts
         this.stringParts = new List<String>();
         this.existingValues = new Set<String>();
-
-        // Options
         this.actionOnNullValue = NullValueAction.CONVERT_TO_BLANK;
         this.trimValue = false;
         this.skipBlanks = false;
@@ -79,7 +72,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder withActionOnNullValue(NullValueAction value) {
         if (value == null) {
-            throw new IllegalStateException('Null Value Action cannot be null');
+            throw new IllegalArgumentException('Null Value Action cannot be null');
         }
         this.actionOnNullValue = value;
         return this;
@@ -93,7 +86,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder withTrimValue(Boolean value) {
         if (value == null) {
-            throw new IllegalStateException('Trim Value cannot be null');
+            throw new IllegalArgumentException('Trim Value cannot be null');
         }
         this.trimValue = value;
         return this;
@@ -107,7 +100,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder withSkipBlanks(Boolean value) {
         if (value == null) {
-            throw new IllegalStateException('Skip Blanks cannot be null');
+            throw new IllegalArgumentException('Skip Blanks cannot be null');
         }
         this.skipBlanks = value;
         return this;
@@ -121,7 +114,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder withDeduplicate(Boolean value) {
         if (value == null) {
-            throw new IllegalStateException('Deduplicate cannot be null');
+            throw new IllegalArgumentException('Deduplicate cannot be null');
         }
         this.deduplicate = value;
         return this;
@@ -135,7 +128,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder withMaxLength(Integer value) {
         if (value == null || value < 0) {
-            throw new IllegalStateException('Max Length must be a value of zero or greater');
+            throw new IllegalArgumentException('Max Length must be a value of zero or greater');
         }
         this.maxLength = value;
         return this;
@@ -220,7 +213,7 @@ public inherited sharing class StringBuilder {
      */
     public StringBuilder appendWhitespace(Whitespace wsType) {
         if (wsType == null) {
-            throw new IllegalStateException('Whitespace argument cannot be null');
+            throw new IllegalArgumentException('Whitespace argument cannot be null');
         }
 
         String token;
@@ -285,11 +278,11 @@ public inherited sharing class StringBuilder {
                 when CONVERT_TO_BLANK {
                     value = '';
                 }
-                when CONVERT_TO_SINGLE_SPACE {
-                    value = ' ';
-                }
                 when CONVERT_TO_LITERAL {
                     value = 'null';
+                }
+                when CONVERT_TO_SINGLE_SPACE {
+                    value = ' ';
                 }
             }
         }

@@ -10,7 +10,7 @@
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_time.htm
  * @see https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
  */
-public inherited sharing class Temporal {
+public without sharing class Temporal {
     /**
      * Significant Values
      */
@@ -44,7 +44,7 @@ public inherited sharing class Temporal {
      * Constructs a Datetime instance in the user's local time zone
      * on the start time (12AM) of the given date.
      * 
-     * @param Date d The given date
+     * @param d The given date
      * @return Datetime instance at 12:00:00 AM on the given date
      */
     public static Datetime localStartOfDay(Date d) {
@@ -223,7 +223,7 @@ public inherited sharing class Temporal {
     /**
      * Adds business days (weekdays only) to a date, skipping weekends.
      * 
-     * @param currentDate The starting date
+     * @param inputDate The starting date
      * @param daysToAdd The number of business days to add (can be negative to subtract)
      * @return The resulting date after adding business days
      */
@@ -286,7 +286,8 @@ public inherited sharing class Temporal {
     }
 
     /**
-     * Returns a human-readable relative date string (e.g., "Today", "Yesterday", "In 5 days").
+     * Returns a human-readable relative date string 
+     * (e.g., "Today", "Yesterday", "In 5 days").
      * 
      * @param d The date to describe relative to today
      * @return A relative date description

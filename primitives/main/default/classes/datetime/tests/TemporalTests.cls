@@ -1,5 +1,5 @@
 /**
- * Contains units for validating functionality for the Temporal class.
+ * Test suite for the Temporal class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0

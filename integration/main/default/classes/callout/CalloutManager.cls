@@ -54,7 +54,7 @@ public inherited sharing class CalloutManager {
      */
     public CalloutManager(Callout_Configuration__mdt config) {
         if (config == null) {
-            throw new QueryException('Callout Configuration must be provided');
+            throw new IllegalArgumentException('Callout Configuration must be provided');
         }
 
         // Set properties

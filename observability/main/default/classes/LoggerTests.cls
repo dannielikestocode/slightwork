@@ -1,5 +1,5 @@
 /**
- * Test class for Logger.
+ * Test suite for the Logger class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0

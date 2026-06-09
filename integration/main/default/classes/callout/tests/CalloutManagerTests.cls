@@ -1,5 +1,5 @@
 /**
- * Test class for CalloutManager.
+ * Test suite for the CalloutManager class.
  * 
  * @author Dannie @ Wynforce
  * @since v66.0

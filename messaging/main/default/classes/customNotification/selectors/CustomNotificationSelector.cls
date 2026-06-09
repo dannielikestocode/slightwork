@@ -15,6 +15,7 @@ public inherited sharing class CustomNotificationSelector {
      * 
      * @param recordId The record Id of the CustomNotificationType
      * @return The CustomNotificationType record
+     * @throws IllegalArgumentException if the provided record Id is invalid
      * @throws QueryException if the query does not return any results
      */
     public CustomNotificationType selectById(Id recordId) {
@@ -43,6 +44,7 @@ public inherited sharing class CustomNotificationSelector {
      * 
      * @param developerName The API name/developer name of the notification type
      * @return The CustomNotificationType record
+     * @throws IllegalArgumentException if the provided developer name is invalid
      * @throws QueryException if the query does not return any results
      */
     public CustomNotificationType selectByDeveloperName(String developerName) {
@@ -72,7 +74,6 @@ public inherited sharing class CustomNotificationSelector {
      * Use with caution in orgs with many notification types.
      * 
      * @return List of all active CustomNotificationType records
-     * @throws QueryException if the query fails
      */
     public List<CustomNotificationType> selectAll() {
         return [

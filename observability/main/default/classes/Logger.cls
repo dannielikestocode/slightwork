@@ -252,7 +252,7 @@ public inherited sharing class Logger {
      * Publishes all queued log records as platform events and clears the queue.
      * Logs any publish errors to System.debug at ERROR level.
      * 
-     * @return List of Database.SaveResult for each published event
+     * @return Database.SaveResult collection of the published log events
      */
     public List<Database.SaveResult> flush() {
         if (this.logQueue.isEmpty()) {
@@ -311,6 +311,7 @@ public inherited sharing class Logger {
      * Maps the log level to the corresponding enum value.
      * 
      * @param targetLogLevel The target log level to be mapped
+     * @return The mapped System.LoggingLevel
      */
     @TestVisible
     private LoggingLevel mapLogLevel(String targetLogLevel) {
@@ -355,6 +356,7 @@ public inherited sharing class Logger {
      * Maps the log target to the corresponding enum value.
      * 
      * @param targetLogTarget The String value of the log target
+     * @return The mapped LogTarget
      */
     @TestVisible
     private LogTarget mapLogTarget(String targetLogTarget) {
