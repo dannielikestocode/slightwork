@@ -1,24 +1,8 @@
 {
   "packageDirectories": [
     {
-      "path": "async",
-      "default": false
-    },
-    {
       "path": "base",
       "default": true
-    },
-    {
-      "path": "components",
-      "default": false
-    },
-    {
-      "path": "entity",
-      "default": false
-    },
-    {
-      "path": "files",
-      "default": false
     },
     {
       "path": "integration",
@@ -38,18 +22,6 @@
     },
     {
       "path": "primitives",
-      "default": false
-    },
-    {
-      "path": "qa",
-      "default": false
-    },
-    {
-      "path": "query",
-      "default": false
-    },
-    {
-      "path": "security",
       "default": false
     }
   ],
