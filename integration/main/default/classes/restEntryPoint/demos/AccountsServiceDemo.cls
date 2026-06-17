@@ -11,9 +11,11 @@ public inherited sharing class AccountsServiceDemo {
     private final Map<Integer, AccountDTO> accountsList {get;set;}
     private Integer currentNumberOfAccounts {get;set;}
 
-    /**
-     * Default, no-arg constructor
-     */
+     /**
+      * Default constructor with params
+      *
+      * @param numberOfAccountsToCreate The number of accounts to create
+      */
     public AccountsServiceDemo(Integer numberOfAccountsToCreate) {
         if (numberOfAccountsToCreate == null || numberOfAccountsToCreate < 1) {
             throw new IllegalArgumentException('Missing number of accounts to created');
