@@ -4,7 +4,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/messaging/custom-notification-manager
+ * @see https://slightwork.dev/modules/messaging/custom-notification.html
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Messaging_CustomNotification.htm
  */
 public without sharing class CustomNotificationManager {

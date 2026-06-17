@@ -4,7 +4,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/integration/callout-manager.html
+ * @see https://slightwork.dev/modules/integration/callout.html
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_classes_restful_http_httprequest.htm For HttpRequest
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_classes_restful_http_httpresponse.htm For HttpResponse
  */

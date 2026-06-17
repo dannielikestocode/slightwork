@@ -4,7 +4,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/primitives/string-builder.html
+ * @see https://slightwork.dev/modules/primitives/string.html
  */
 public without sharing class StringBuilder {
     /**

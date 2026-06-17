@@ -5,7 +5,7 @@
  * 
  * @author Dannie @ Wynforce
  * @since v66.0
- * @see https://slightwork.dev/modules/integration/rest-entry-point.html
+ * @see https://slightwork.dev/modules/integration/rest.html
  * @see https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_rest_intro.htm
  */
 @RestResource(urlMapping='/*')
