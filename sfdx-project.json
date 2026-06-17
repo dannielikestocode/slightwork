@@ -1,12 +1,32 @@
 {
   "packageDirectories": [
     {
-      "path": "force-app",
+      "path": "base",
       "default": true
+    },
+    {
+      "path": "integration",
+      "default": false
+    },
+    {
+      "path": "messaging",
+      "default": false
+    },
+    {
+      "path": "observability",
+      "default": false
+    },
+    {
+      "path": "platform",
+      "default": false
+    },
+    {
+      "path": "primitives",
+      "default": false
     }
   ],
   "name": "slightwork",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "64.0"
+  "sourceApiVersion": "66.0"
 }

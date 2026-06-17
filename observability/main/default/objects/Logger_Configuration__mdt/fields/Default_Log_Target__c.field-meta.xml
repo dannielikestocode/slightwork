@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Default_Log_Target__c</fullName>
+    <description>Determines the target for where logs are published.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Determines the target for where logs are published.</inlineHelpText>
+    <label>Default Log Target</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SYSTEM_DEBUG</fullName>
+                <default>false</default>
+                <label>SYSTEM_DEBUG</label>
+            </value>
+            <value>
+                <fullName>PLATFORM_EVENT</fullName>
+                <default>false</default>
+                <label>PLATFORM_EVENT</label>
+            </value>
+            <value>
+                <fullName>ALL</fullName>
+                <default>true</default>
+                <label>ALL</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

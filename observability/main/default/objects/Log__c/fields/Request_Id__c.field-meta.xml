@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Request_Id__c</fullName>
+    <description>Captures the Id of the Apex transaction</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Captures the Id of the Apex transaction</inlineHelpText>
+    <label>Request Id</label>
+    <length>100</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
