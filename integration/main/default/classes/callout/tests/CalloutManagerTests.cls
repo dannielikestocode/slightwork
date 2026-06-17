@@ -33,7 +33,7 @@ private without sharing class CalloutManagerTests {
         callout.withTimeout(5000);
         callout.withCompression(false);
         callout.withHeader('X-Test','value');
-        callout.withQueryParam('q','1');
+        callout.withUrlParam('q','1');
         callout.withBody('{"data":"x"}');
 
         Test.startTest();
@@ -157,23 +157,23 @@ private without sharing class CalloutManagerTests {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Empty headers should throw');
         }
 
-        // withQueryParam blank key
+        // withUrlParam blank key
         try {
-            callout.withQueryParam('', 'v');
+            callout.withUrlParam('', 'v');
             Assert.fail('Expected IllegalArgumentException for blank query key');
         } catch (Exception ex) {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Blank query key should throw');
         }
 
-        // withQueryParams null/empty
+        // withUrlParams null/empty
         try {
-            callout.withQueryParams(null);
+            callout.withUrlParams(null);
             Assert.fail('Expected IllegalArgumentException for null query params');
         } catch (Exception ex) {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Null query params should throw');
         }
         try {
-            callout.withQueryParams(new Map<String,String>());
+            callout.withUrlParams(new Map<String,String>());
             Assert.fail('Expected IllegalArgumentException for empty query params');
         } catch (Exception ex) {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Empty query params should throw');
@@ -187,9 +187,9 @@ private without sharing class CalloutManagerTests {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Blank named credential should throw');
         }
 
-        // withEncodeQueryParams with null value
+        // withEncodeUrlParams with null value
         try {
-            callout.withEncodeQueryParams(null);
+            callout.withEncodeUrlParams(null);
             // no exception expected for valid boolean
         } catch (Exception ex) {
             Assert.isInstanceOfType(ex, IllegalArgumentException.class, 'Null query params should throw');

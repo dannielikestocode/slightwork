@@ -22,10 +22,10 @@ public inherited sharing class CalloutManager {
     /**
      * Properties
      */
-    @TestVisible private Boolean encodeQueryParams {get;set;}
+    @TestVisible private Boolean encodeUrlParams {get;set;}
     @TestVisible private String calloutName {get;set;}
     @TestVisible private final Map<String, String> headers {get;set;}
-    @TestVisible private final Map<String, String> queryParams {get;set;}
+    @TestVisible private final Map<String, String> urlParams {get;set;}
     @TestVisible private String endpoint {get;set;}
     @TestVisible private String method {get;set;}
     @TestVisible private String body {get;set;}
@@ -40,9 +40,9 @@ public inherited sharing class CalloutManager {
      * Default, no-arg constructor
      */
     public CalloutManager() {
-        this.encodeQueryParams = false;
+        this.encodeUrlParams = false;
         this.headers = new Map<String, String>();
-        this.queryParams = new Map<String, String>();
+        this.urlParams = new Map<String, String>();
         this.compressed = false;
     }
 
@@ -58,10 +58,10 @@ public inherited sharing class CalloutManager {
         }
 
         // Set properties
-        this.encodeQueryParams = false;
+        this.encodeUrlParams = false;
         this.calloutName = config.DeveloperName;
         this.headers = new Map<String, String>();
-        this.queryParams = new Map<String, String>();
+        this.urlParams = new Map<String, String>();
         this.compressed = false;
 
         if (String.isNotBlank(config.Endpoint__c)) {
@@ -89,7 +89,7 @@ public inherited sharing class CalloutManager {
         }
 
         if (config.Encode_Query_Params__c != null) {
-            this.encodeQueryParams = config.Encode_Query_Params__c;
+            this.encodeUrlParams = config.Encode_Query_Params__c;
         }
     }
     
@@ -299,14 +299,14 @@ public inherited sharing class CalloutManager {
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException if param key is blank
      */
-    public CalloutManager withQueryParam(String key, String value) {
+    public CalloutManager withUrlParam(String key, String value) {
         if (String.isBlank(key)) {
             throw new IllegalArgumentException('Query parameter key cannot be blank');
         }
 
         // Some APIs may accept blank query param values
         if (value != null) {
-            this.queryParams.put(key, value);
+            this.urlParams.put(key, value);
         }
         return this;
     }
@@ -315,17 +315,17 @@ public inherited sharing class CalloutManager {
      * Adds multiple query parameters to the endpoint URL.
      * Parameters are automatically URL-encoded.
      * 
-     * @param queryParams Map of parameter keys to values
+     * @param urlParams Map of parameter keys to values
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException if params is null or empty, or param key is blank
      */
-    public CalloutManager withQueryParams(Map<String, String> queryParams) {
-        if (queryParams == null || queryParams.isEmpty()) {
+    public CalloutManager withUrlParams(Map<String, String> urlParams) {
+        if (urlParams == null || urlParams.isEmpty()) {
             throw new IllegalArgumentException('At least 1 query parameter must be provided');
         }
 
-        for (String key: queryParams.keySet()) {
-            this.withQueryParam(key, queryParams.get(key));
+        for (String key: urlParams.keySet()) {
+            this.withUrlParam(key, urlParams.get(key));
         }
         return this;
     }
@@ -349,15 +349,15 @@ public inherited sharing class CalloutManager {
     /**
      * Enables encoding of query params within the endpoint.
      * 
-     * @param encodeQueryParams True to enable request capture
+     * @param encodeUrlParams True to enable request capture
      * @return This builder instance for method chaining
      * @throws IllegalArgumentException when encode query params is null
      */
-    public CalloutManager withEncodeQueryParams(Boolean encodeQueryParams) {
-        if (encodeQueryParams == null) {
+    public CalloutManager withEncodeUrlParams(Boolean encodeUrlParams) {
+        if (encodeUrlParams == null) {
             throw new IllegalArgumentException('Encode Query Params must be provided');
         }
-        this.encodeQueryParams = encodeQueryParams;
+        this.encodeUrlParams = encodeUrlParams;
         return this;
     }
     
@@ -451,16 +451,16 @@ public inherited sharing class CalloutManager {
         endpointParts.add(this.endpoint);
 
         // Add query parameters, if any
-        if (!this.queryParams.isEmpty()) {
+        if (!this.urlParams.isEmpty()) {
             endpointParts.add('?');
 
             // Add any query params to list of endpoint parts
-            Integer numberOfParams = this.queryParams.size();
+            Integer numberOfParams = this.urlParams.size();
             Integer paramCounter = 0;
-            for (String key: this.queryParams.keySet()) {
-                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(key, CHARSET_UTF8) : key);
+            for (String key: this.urlParams.keySet()) {
+                endpointParts.add(this.encodeUrlParams ? EncodingUtil.urlEncode(key, CHARSET_UTF8) : key);
                 endpointParts.add('=');
-                endpointParts.add(this.encodeQueryParams ? EncodingUtil.urlEncode(this.queryParams.get(key), CHARSET_UTF8) : this.queryParams.get(key) );
+                endpointParts.add(this.encodeUrlParams ? EncodingUtil.urlEncode(this.urlParams.get(key), CHARSET_UTF8) : this.urlParams.get(key) );
 
                 // If there are multiple query params, don't include the
                 // ampersand/concat operator after the final param
@@ -512,12 +512,12 @@ public inherited sharing class CalloutManager {
             requestRecord.Client_Certificate__c = callout.clientCertificateName;
             requestRecord.Timeout__c = callout.timeout;
             requestRecord.Compressed__c = callout.compressed;
-            requestRecord.Encode_Query_Params__c = callout.encodeQueryParams;
+            requestRecord.Encode_Query_Params__c = callout.encodeUrlParams;
 
             // Set request details
             requestRecord.Method__c = callout.method;
             requestRecord.Endpoint__c = request.getEndpoint();
-            requestRecord.Query_Params__c = JSON.serialize(callout.queryParams);
+            requestRecord.Query_Params__c = JSON.serialize(callout.urlParams);
             requestRecord.Request_Headers__c = JSON.serialize(callout.headers);
             requestRecord.Request_Body__c = this.getTruncatedBody(request.getBody());
 

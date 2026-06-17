@@ -34,7 +34,7 @@ public class UserRequestHandler implements Requestable {
     
     public void handleGet(RequestContext context) {
         String userId = context.getPathParam('id');
-        String filter = context.getQueryParam('filter');
+        String filter = context.getUrlParam('filter');
         
         // Your logic here
         RestResponse res = context.getRestContext().response;
@@ -122,9 +122,9 @@ Map<String, String> allPathParams = context.getPathParams();
 ### Query Parameters
 
 ```apex
-String filter = context.getQueryParam('filter');
-String page = context.getQueryParam('page');
-Map<String, String> allQueryParams = context.getQueryParams();
+String filter = context.getUrlParam('filter');
+String page = context.getUrlParam('page');
+Map<String, String> allUrlParams = context.getUrlParams();
 ```
 
 ### Headers
@@ -252,8 +252,8 @@ public void handlePost(RequestContext context) {
 For bulk operations, consider pagination:
 ```apex
 public void handleGet(RequestContext context) {
-    String pageSize = context.getQueryParam('pageSize');
-    String offset = context.getQueryParam('offset');
+    String pageSize = context.getUrlParam('pageSize');
+    String offset = context.getUrlParam('offset');
     
     Integer size = String.isNotBlank(pageSize) ? Integer.valueOf(pageSize) : 50;
     Integer off = String.isNotBlank(offset) ? Integer.valueOf(offset) : 0;
